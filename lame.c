@@ -1,6 +1,7 @@
 #include "raylib.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stddef.h>
 
 #define WINDOW_WIDTH  800
@@ -30,6 +31,9 @@ void state_deinit(LameState *);
 
 bool any_key_pressed(int *);
 
+void handle_editor_events(LameState *);
+void handle_cursor_movement(LameState *);
+
 void new_line(LameState *);
 void delete_char_cursor(LameState *);
 void append_char_cursor(LameState *, int);
@@ -53,24 +57,9 @@ int main(int argc, char **argv)
     SetTargetFPS(FPS);
 
     while (!state.exit) {
-        if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_Q))
-            state.exit = true;
+        handle_editor_events(&state);
 
-        if (IsKeyPressed(KEY_LEFT))
-            state.cursor -= state.cursor > 0? 1 : 0;
-        else if (IsKeyPressed(KEY_RIGHT))
-            state.cursor += 1;
-
-        int key;
-        if (any_key_pressed(&key)) {
-            int c = GetCharPressed();
-            if (key == KEY_ENTER)
-                new_line(&state);
-            else if (key == KEY_BACKSPACE && state.cursor > 0)
-                delete_char_cursor(&state);
-            else if (c >= ' ' && c <= '~')
-                append_char_cursor(&state, c);
-        }
+        handle_cursor_movement(&state);
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
@@ -117,6 +106,43 @@ bool any_key_pressed(int *key)
 {
     *key = GetKeyPressed();
     return *key >= ' ' && *key <= KEY_KB_MENU;
+}
+
+void handle_editor_events(LameState *state)
+{
+    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_Q))
+        state->exit = true;
+
+    int key;
+    if (any_key_pressed(&key)) {
+        int c = GetCharPressed();
+        if (key == KEY_ENTER)
+            new_line(state);
+        else if (key == KEY_BACKSPACE && state->cursor > 0)
+            delete_char_cursor(state);
+        else if (c >= ' ' && c <= '~')
+            append_char_cursor(state, c);
+    }
+}
+
+void handle_cursor_movement(LameState *state)
+{
+    if (IsKeyPressed(KEY_LEFT))
+        state->cursor -= state->cursor > 0? 1 : 0;
+    else if (IsKeyPressed(KEY_RIGHT))
+        state->cursor += state->cursor < strlen(state->lines[state->line])? 1 : 0;
+    else if (IsKeyPressed(KEY_UP)) {
+        if (state->line > 0)
+            --state->line;
+        else
+            state->cursor = 0;
+    }
+    else if (IsKeyPressed(KEY_DOWN)) {
+        if (state->line + 1 < state->lines_num)
+            ++state->line;
+        else
+            state->cursor = strlen(state->lines[state->line]);
+    }
 }
 
 void new_line(LameState *state)
