@@ -35,6 +35,7 @@ void delete_char_cursor(LameState *);
 void append_char_cursor(LameState *, int);
 
 void draw_text(LameState *, const char *, int, int, Color);
+void draw_cursor(LameState *);
 
 int main(int argc, char **argv)
 {
@@ -75,6 +76,7 @@ int main(int argc, char **argv)
         ClearBackground(RAYWHITE);
         for (int i = 0; i < state.lines_num; ++i)
             draw_text(&state, state.lines[i], 0, i*state.font_size, BLACK);
+        draw_cursor(&state);
         EndDrawing();
     }
 
@@ -111,6 +113,12 @@ void state_deinit(LameState *state)
     state->cursor = 0;
 }
 
+bool any_key_pressed(int *key)
+{
+    *key = GetKeyPressed();
+    return *key >= ' ' && *key <= KEY_KB_MENU;
+}
+
 void new_line(LameState *state)
 {
     Line new = calloc(LINE_SIZE, sizeof(char));
@@ -141,8 +149,11 @@ void draw_text(LameState *state, const char *text, int x, int y, Color color)
     DrawTextEx(state->font, text, (Vector2){x, y}, (float)state->font_size, 1.0f, color);
 }
 
-bool any_key_pressed(int *key)
+void draw_cursor(LameState *state)
 {
-    *key = GetKeyPressed();
-    return *key >= ' ' && *key <= KEY_KB_MENU;
+    char ch = state->lines[state->line][state->cursor - 1];
+    GlyphInfo glyph = GetGlyphInfo(state->font, ch);
+
+    Rectangle cursor_rec = { state->cursor*(glyph.advanceX + 1), state->line*state->font_size, glyph.advanceX, 20.0f };
+    DrawRectangleRec(cursor_rec, Fade(BLACK, 0.5f));
 }
