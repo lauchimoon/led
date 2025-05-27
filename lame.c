@@ -21,9 +21,9 @@ typedef struct LameState {
     Line *lines;
     int lines_capacity;
     int lines_num;
+
     int line;
     int cursor;
-
     int repeat_cooldown;
 
     Font font;
@@ -41,6 +41,7 @@ void handle_cursor_movement(LameState *);
 void new_line(LameState *);
 void delete_char_cursor(LameState *);
 void append_char_cursor(LameState *, int);
+void delete_line(LameState *);
 
 void draw_text(LameState *, const char *, int, int, Color);
 void draw_cursor(LameState *);
@@ -83,17 +84,17 @@ int main(int argc, char **argv)
 
 void state_init(LameState *state)
 {
-    state->font_size = 24;
-    state->font = LoadFontEx("fonts/GeistMono-Regular.ttf", state->font_size, NULL, 95);
-
     state->lines_capacity = 100;
     state->line = -1;
     state->lines = calloc(state->lines_capacity, sizeof(Line));
     new_line(state);
 
+    state->cursor = 0;
     state->repeat_cooldown = 0;
 
-    state->cursor = 0;
+    state->font_size = 24;
+    state->font = LoadFontEx("fonts/GeistMono-Regular.ttf", state->font_size, NULL, 95);
+
 }
 
 void state_deinit(LameState *state)
@@ -122,12 +123,15 @@ void handle_editor_events(LameState *state)
     if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_Q))
         state->exit = true;
 
-    if (state->cursor < 0)
-        state->cursor = 0;
-
     if (IsKeyDown(KEY_BACKSPACE) && state->cursor > 0 &&
             state->repeat_cooldown % REPEAT_COOLDOWN == 0)
         delete_char_cursor(state);
+
+    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_D))
+        delete_line(state);
+
+    if (state->cursor < 0)
+        state->cursor = 0;
 
     int key;
     if (any_key_pressed(&key)) {
@@ -191,6 +195,22 @@ void delete_char_cursor(LameState *state)
 void append_char_cursor(LameState *state, int c)
 {
     state->lines[state->line][state->cursor++] = c;
+}
+
+void delete_line(LameState *state)
+{
+    Line line = state->lines[state->line];
+    if (state->lines_num == 1) {
+        memset(line, 0, strlen(line));
+    } else {
+        free(line);
+        for (int i = state->line; i < state->lines_num; ++i)
+            state->lines[i] = state->lines[i+1];
+
+        --state->lines_num;
+        state->line -= state->line > 0? 1 : 0;
+    }
+    state->cursor = 0;
 }
 
 void draw_text(LameState *state, const char *text, int x, int y, Color color)
