@@ -10,7 +10,7 @@
 
 #define LINE_SIZE       1024
 
-#define DELETE_COOLDOWN 3
+#define REPEAT_COOLDOWN 3
 
 typedef char *Line;
 
@@ -24,7 +24,7 @@ typedef struct LameState {
     int line;
     int cursor;
 
-    int delete_cooldown;
+    int repeat_cooldown;
 
     Font font;
     int font_size;
@@ -61,6 +61,9 @@ int main(int argc, char **argv)
     SetTargetFPS(FPS);
 
     while (!state.exit) {
+        ++state.repeat_cooldown;
+        state.repeat_cooldown %= REPEAT_COOLDOWN;
+
         handle_editor_events(&state);
 
         handle_cursor_movement(&state);
@@ -88,7 +91,7 @@ void state_init(LameState *state)
     state->lines = calloc(state->lines_capacity, sizeof(Line));
     new_line(state);
 
-    state->delete_cooldown = 0;
+    state->repeat_cooldown = 0;
 
     state->cursor = 0;
 }
@@ -116,14 +119,14 @@ bool any_key_pressed(int *key)
 
 void handle_editor_events(LameState *state)
 {
-    ++state->delete_cooldown;
     if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_Q))
         state->exit = true;
 
     if (state->cursor < 0)
         state->cursor = 0;
 
-    if (IsKeyDown(KEY_BACKSPACE) && state->cursor > 0 && state->delete_cooldown % DELETE_COOLDOWN == 0)
+    if (IsKeyDown(KEY_BACKSPACE) && state->cursor > 0 &&
+            state->repeat_cooldown % REPEAT_COOLDOWN == 0)
         delete_char_cursor(state);
 
     int key;
@@ -138,17 +141,17 @@ void handle_editor_events(LameState *state)
 
 void handle_cursor_movement(LameState *state)
 {
-    if (IsKeyPressed(KEY_LEFT))
+    if (IsKeyDown(KEY_LEFT) && state->repeat_cooldown % REPEAT_COOLDOWN == 0)
         state->cursor -= state->cursor > 0? 1 : 0;
-    else if (IsKeyPressed(KEY_RIGHT))
+    else if (IsKeyDown(KEY_RIGHT) && state->repeat_cooldown % REPEAT_COOLDOWN == 0)
         state->cursor += state->cursor < strlen(state->lines[state->line])? 1 : 0;
-    else if (IsKeyPressed(KEY_UP)) {
+    else if (IsKeyDown(KEY_UP) && state->repeat_cooldown % REPEAT_COOLDOWN == 0) {
         if (state->line > 0)
             --state->line;
         else
             state->cursor = 0;
     }
-    else if (IsKeyPressed(KEY_DOWN)) {
+    else if (IsKeyDown(KEY_DOWN) && state->repeat_cooldown % REPEAT_COOLDOWN == 0) {
         if (state->line + 1 < state->lines_num)
             ++state->line;
         else
