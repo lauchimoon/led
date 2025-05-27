@@ -205,7 +205,7 @@ void delete_line(LameState *state)
     } else {
         free(line);
         for (int i = state->line; i < state->lines_num; ++i)
-            state->lines[i] = state->lines[i+1];
+            state->lines[i] = state->lines[i + 1];
 
         --state->lines_num;
         state->line -= state->line > 0? 1 : 0;
