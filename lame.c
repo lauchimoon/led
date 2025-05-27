@@ -4,11 +4,13 @@
 #include <string.h>
 #include <stddef.h>
 
-#define WINDOW_WIDTH  800
-#define WINDOW_HEIGHT 600
-#define FPS           60
+#define WINDOW_WIDTH    800
+#define WINDOW_HEIGHT   600
+#define FPS             60
 
-#define LINE_SIZE     1024
+#define LINE_SIZE       1024
+
+#define DELETE_COOLDOWN 3
 
 typedef char *Line;
 
@@ -21,6 +23,8 @@ typedef struct LameState {
     int lines_num;
     int line;
     int cursor;
+
+    int delete_cooldown;
 
     Font font;
     int font_size;
@@ -84,6 +88,8 @@ void state_init(LameState *state)
     state->lines = calloc(state->lines_capacity, sizeof(Line));
     new_line(state);
 
+    state->delete_cooldown = 0;
+
     state->cursor = 0;
 }
 
@@ -110,16 +116,21 @@ bool any_key_pressed(int *key)
 
 void handle_editor_events(LameState *state)
 {
+    ++state->delete_cooldown;
     if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_Q))
         state->exit = true;
+
+    if (state->cursor < 0)
+        state->cursor = 0;
+
+    if (IsKeyDown(KEY_BACKSPACE) && state->cursor > 0 && state->delete_cooldown % DELETE_COOLDOWN == 0)
+        delete_char_cursor(state);
 
     int key;
     if (any_key_pressed(&key)) {
         int c = GetCharPressed();
         if (key == KEY_ENTER)
             new_line(state);
-        else if (key == KEY_BACKSPACE && state->cursor > 0)
-            delete_char_cursor(state);
         else if (c >= ' ' && c <= '~')
             append_char_cursor(state, c);
     }
