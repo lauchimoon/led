@@ -141,20 +141,29 @@ void handle_editor_events(LameState *state)
 
 void handle_cursor_movement(LameState *state)
 {
+    int current_line_len = strlen(state->lines[state->line]);
+
     if (IsKeyDown(KEY_LEFT) && state->repeat_cooldown % REPEAT_COOLDOWN == 0)
         state->cursor -= state->cursor > 0? 1 : 0;
     else if (IsKeyDown(KEY_RIGHT) && state->repeat_cooldown % REPEAT_COOLDOWN == 0)
-        state->cursor += state->cursor < strlen(state->lines[state->line])? 1 : 0;
+        state->cursor += state->cursor < current_line_len? 1 : 0;
     else if (IsKeyDown(KEY_UP) && state->repeat_cooldown % REPEAT_COOLDOWN == 0) {
-        if (state->line > 0)
+        if (state->line > 0) {
+            int line_above_len = strlen(state->lines[state->line - 1]);
             --state->line;
-        else
+
+            if (state->cursor > line_above_len)
+                state->cursor = line_above_len;
+        } else
             state->cursor = 0;
-    }
-    else if (IsKeyDown(KEY_DOWN) && state->repeat_cooldown % REPEAT_COOLDOWN == 0) {
-        if (state->line + 1 < state->lines_num)
+    } else if (IsKeyDown(KEY_DOWN) && state->repeat_cooldown % REPEAT_COOLDOWN == 0) {
+        if (state->line + 1 < state->lines_num) {
+            int line_below_len = strlen(state->lines[state->line + 1]);
             ++state->line;
-        else
+
+            if (state->cursor > line_below_len)
+                state->cursor = line_below_len;
+        } else
             state->cursor = strlen(state->lines[state->line]);
     }
 }
