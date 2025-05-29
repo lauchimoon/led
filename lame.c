@@ -53,6 +53,7 @@ int main(int argc, char **argv)
         .exit  = false,
     };
 
+    SetTraceLogLevel(LOG_NONE);
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, state.title);
     SetWindowMinSize(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
@@ -94,7 +95,6 @@ void state_init(LameState *state)
 
     state->font_size = 24;
     state->font = LoadFontEx("fonts/GeistMono-Regular.ttf", state->font_size, NULL, 95);
-
 }
 
 void state_deinit(LameState *state)
@@ -161,7 +161,7 @@ void handle_cursor_movement(LameState *state)
         } else
             state->cursor = 0;
     } else if (IsKeyDown(KEY_DOWN) && state->repeat_cooldown % REPEAT_COOLDOWN == 0) {
-        if (state->line + 1 < state->lines_num) {
+        if (state->lines[state->line + 1]) {
             int line_below_len = strlen(state->lines[state->line + 1]);
             ++state->line;
 
