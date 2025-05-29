@@ -188,7 +188,13 @@ void new_line(LameState *state)
 
 void delete_char_cursor(LameState *state)
 {
-    state->lines[state->line][state->cursor - 1] = 0;
+    Line line = state->lines[state->line];
+    int line_len = strlen(line);
+    if (line_len < 1)
+        return;
+
+    for (int i = state->cursor - 1; i < line_len; ++i)
+        state->lines[state->line][i] = state->lines[state->line][i + 1];
     --state->cursor;
 }
 
