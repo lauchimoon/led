@@ -194,13 +194,20 @@ void delete_char_cursor(LameState *state)
         return;
 
     for (int i = state->cursor - 1; i < line_len; ++i)
-        state->lines[state->line][i] = state->lines[state->line][i + 1];
+        line[i] = line[i + 1];
+
     --state->cursor;
 }
 
 void append_char_cursor(LameState *state, int c)
 {
-    state->lines[state->line][state->cursor++] = c;
+    Line line = state->lines[state->line];
+    int line_len = strlen(line);
+
+    for (int i = line_len; i > state->cursor; --i)
+        line[i] = line[i - 1];
+
+    line[state->cursor++] = c;
 }
 
 void delete_line(LameState *state)
