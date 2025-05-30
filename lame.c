@@ -236,7 +236,7 @@ void delete_line(LameState *state)
 
 void append_tab(LameState *state)
 {
-    for (int i = 0; i < 3; ++i)
+    for (int i = 0; i < 4; ++i)
         append_char_cursor(state, ' ');
 }
 
