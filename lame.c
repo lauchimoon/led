@@ -34,6 +34,7 @@ typedef struct LameState {
 } LameState;
 
 void state_init(LameState *, const char *);
+void load_file(LameState *);
 void state_deinit(LameState *);
 
 bool any_key_pressed(int *);
@@ -101,16 +102,43 @@ void state_init(LameState *state, const char *filename)
 {
     state->filename = filename;
 
-    state->lines_capacity = 100;
-    state->line = -1;
-    state->lines = calloc(state->lines_capacity, sizeof(Line));
-    new_line(state);
-
     state->cursor = 0;
     state->repeat_cooldown = 0;
 
     state->font_size = 24;
     state->font = LoadFontEx("fonts/GeistMono-Regular.ttf", state->font_size, NULL, 95);
+
+    state->line = -1;
+    state->lines_capacity = 100;
+    state->lines = calloc(state->lines_capacity, sizeof(Line));
+
+    if (FileExists(state->filename)) {
+        load_file(state);
+        state->line = 0;
+        return;
+    }
+
+    new_line(state);
+}
+
+void load_file(LameState *state)
+{
+    FILE *f = fopen(state->filename, "r");
+    char buffer[LINE_SIZE] = { 0 };
+
+    while (fgets(buffer, LINE_SIZE, f) != NULL) {
+        state->lines[state->lines_num] = calloc(LINE_SIZE, sizeof(char));
+        int line_len = strlen(buffer);
+        strncpy(state->lines[state->lines_num], buffer, line_len - 1);
+
+        ++state->lines_num;
+        if (state->lines_num >= state->lines_capacity/2) {
+            state->lines_capacity *= 2;
+            state->lines = realloc(state->lines, state->lines_capacity*sizeof(Line));
+        }
+    }
+
+    fclose(f);
 }
 
 void state_deinit(LameState *state)
