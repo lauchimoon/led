@@ -42,6 +42,7 @@ void new_line(LameState *);
 void delete_char_cursor(LameState *);
 void append_char_cursor(LameState *, int);
 void delete_line(LameState *);
+void append_tab(LameState *);
 
 void draw_text(LameState *, const char *, int, int, Color);
 void draw_cursor(LameState *);
@@ -129,6 +130,9 @@ void handle_editor_events(LameState *state)
 
     if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_D))
         delete_line(state);
+
+    if (IsKeyPressed(KEY_TAB))
+        append_tab(state);
 
     if (state->cursor < 0)
         state->cursor = 0;
@@ -228,6 +232,12 @@ void delete_line(LameState *state)
         state->line -= state->line > 0? 1 : 0;
     }
     state->cursor = 0;
+}
+
+void append_tab(LameState *state)
+{
+    for (int i = 0; i < 3; ++i)
+        append_char_cursor(state, ' ');
 }
 
 void draw_text(LameState *state, const char *text, int x, int y, Color color)
