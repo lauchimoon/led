@@ -231,7 +231,7 @@ void new_line(LameState *state)
         state->lines[i] = state->lines[i - 1];
 
     ++state->line;
-    if (state->line >= state->lines_capacity/2) {
+    if (state->lines_num >= state->lines_capacity/2) {
         state->lines_capacity *= 2;
         state->lines = realloc(state->lines, state->lines_capacity*sizeof(Line));
     }
