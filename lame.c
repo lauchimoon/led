@@ -176,12 +176,16 @@ void new_line(LameState *state)
 {
     Line new = calloc(LINE_SIZE, sizeof(char));
     ++state->lines_num;
+
+    for (int i = state->lines_num; i > state->line; --i)
+        state->lines[i] = state->lines[i - 1];
+
     ++state->line;
     if (state->line >= state->lines_capacity/2) {
         state->lines_capacity *= 2;
         state->lines = realloc(state->lines, state->lines_capacity*sizeof(Line));
     }
-    
+
     state->lines[state->line] = new;
     state->cursor = 0;
 }
