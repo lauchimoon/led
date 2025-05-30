@@ -16,6 +16,7 @@ typedef char *Line;
 
 typedef struct LameState {
     char *title;
+    char *filename;
     bool exit;
 
     Line *lines;
@@ -28,6 +29,8 @@ typedef struct LameState {
 
     Font font;
     int font_size;
+
+    bool dirty;
 } LameState;
 
 void state_init(LameState *);
@@ -43,9 +46,11 @@ void delete_char_cursor(LameState *);
 void append_char_cursor(LameState *, int);
 void delete_line(LameState *);
 void append_tab(LameState *);
+void write_file(LameState *);
 
 void draw_text(LameState *, const char *, int, int, Color);
 void draw_cursor(LameState *);
+void draw_hud(LameState *);
 
 int main(int argc, char **argv)
 {
@@ -76,6 +81,7 @@ int main(int argc, char **argv)
         for (int i = 0; i < state.lines_num; ++i)
             draw_text(&state, state.lines[i], 0, i*state.font_size, BLACK);
         draw_cursor(&state);
+        draw_hud(&state);
         EndDrawing();
     }
 
@@ -86,6 +92,8 @@ int main(int argc, char **argv)
 
 void state_init(LameState *state)
 {
+    state->filename = "file.c";
+
     state->lines_capacity = 100;
     state->line = -1;
     state->lines = calloc(state->lines_capacity, sizeof(Line));
@@ -133,6 +141,9 @@ void handle_editor_events(LameState *state)
 
     if (IsKeyPressed(KEY_TAB))
         append_tab(state);
+
+    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S))
+        write_file(state);
 
     if (state->cursor < 0)
         state->cursor = 0;
@@ -205,6 +216,7 @@ void delete_char_cursor(LameState *state)
         line[i] = line[i + 1];
 
     --state->cursor;
+    state->dirty = true;
 }
 
 void append_char_cursor(LameState *state, int c)
@@ -216,6 +228,7 @@ void append_char_cursor(LameState *state, int c)
         line[i] = line[i - 1];
 
     line[state->cursor++] = c;
+    state->dirty = true;
 }
 
 void delete_line(LameState *state)
@@ -231,13 +244,27 @@ void delete_line(LameState *state)
         --state->lines_num;
         state->line -= state->line > 0? 1 : 0;
     }
+
     state->cursor = 0;
+    state->dirty = true;
 }
 
 void append_tab(LameState *state)
 {
     for (int i = 0; i < 4; ++i)
         append_char_cursor(state, ' ');
+
+    state->dirty = true;
+}
+
+void write_file(LameState *state)
+{
+    state->dirty = false;
+    FILE *f = fopen(state->filename, "w");
+    for (int i = 0; i < state->lines_num; ++i)
+        fprintf(f, "%s\n", state->lines[i]);
+
+    fclose(f);
 }
 
 void draw_text(LameState *state, const char *text, int x, int y, Color color)
@@ -252,4 +279,9 @@ void draw_cursor(LameState *state)
 
     Rectangle cursor_rec = { state->cursor*(glyph.advanceX + 1), state->line*state->font_size, glyph.advanceX, 20.0f };
     DrawRectangleRec(cursor_rec, Fade(BLACK, 0.5f));
+}
+
+void draw_hud(LameState *state)
+{
+    draw_text(state, TextFormat((state->dirty? "%s [*]" : "%s"), state->filename), 0, GetScreenHeight() - state->font_size, BLACK);
 }
