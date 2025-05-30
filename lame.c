@@ -15,8 +15,8 @@
 typedef char *Line;
 
 typedef struct LameState {
-    char *title;
-    char *filename;
+    const char *title;
+    const char *filename;
     bool exit;
 
     Line *lines;
@@ -33,7 +33,7 @@ typedef struct LameState {
     bool dirty;
 } LameState;
 
-void state_init(LameState *);
+void state_init(LameState *, const char *);
 void state_deinit(LameState *);
 
 bool any_key_pressed(int *);
@@ -54,8 +54,15 @@ void draw_hud(LameState *);
 
 int main(int argc, char **argv)
 {
+    if (argc < 2) {
+        printf("usage: lame <file>\n");
+        return 1;
+    }
+
+    const char *filename = argv[1];
+
     LameState state = {
-        .title = "lame",
+        .title = TextFormat("lame - %s", filename),
         .exit  = false,
     };
 
@@ -64,7 +71,7 @@ int main(int argc, char **argv)
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, state.title);
     SetWindowMinSize(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
 
-    state_init(&state);
+    state_init(&state, filename);
 
     SetTargetFPS(FPS);
 
@@ -90,9 +97,9 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void state_init(LameState *state)
+void state_init(LameState *state, const char *filename)
 {
-    state->filename = "file.c";
+    state->filename = filename;
 
     state->lines_capacity = 100;
     state->line = -1;
