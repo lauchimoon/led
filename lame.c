@@ -312,7 +312,7 @@ void draw_cursor(LameState *state)
     char ch = state->lines[state->line][state->cursor - 1];
     GlyphInfo glyph = GetGlyphInfo(state->font, ch);
 
-    Rectangle cursor_rec = { state->cursor*(glyph.advanceX + 1), state->line*state->font_size, glyph.advanceX, 20.0f };
+    Rectangle cursor_rec = { state->cursor*(glyph.advanceX + 1), state->line*state->font_size, glyph.advanceX, state->font_size };
     DrawRectangleRec(cursor_rec, Fade(BLACK, 0.5f));
 }
 
