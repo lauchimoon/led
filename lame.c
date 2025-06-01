@@ -196,12 +196,6 @@ void handle_editor_events(LameState *state)
     if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S))
         write_file(state);
 
-    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_ZERO))
-        move_to_start(state);
-
-    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_E))
-        move_to_end(state);
-
     if (state->cursor < 0)
         state->cursor = 0;
 
@@ -253,6 +247,13 @@ void handle_cursor_movement(LameState *state)
         } else
             state->cursor = strlen(state->lines[state->line]);
     }
+
+    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_ZERO))
+        move_to_start(state);
+
+    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_E))
+        move_to_end(state);
+
 }
 
 int get_number_lines_on_screen(LameState *state)
