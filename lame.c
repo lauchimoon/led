@@ -24,6 +24,7 @@ typedef struct LameState {
     int lines_num;
 
     int line;
+    int line_scroll;
     int cursor;
     int repeat_cooldown;
 
@@ -31,6 +32,8 @@ typedef struct LameState {
     int font_size;
 
     bool dirty;
+
+    Camera2D camera;
 } LameState;
 
 void state_init(LameState *, const char *);
@@ -41,6 +44,7 @@ bool any_key_pressed(int *);
 
 void handle_editor_events(LameState *);
 void handle_cursor_movement(LameState *);
+int get_number_lines_on_screen(LameState *);
 
 void new_line(LameState *);
 void delete_char_cursor(LameState *);
@@ -86,9 +90,13 @@ int main(int argc, char **argv)
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
-        for (int i = 0; i < state.lines_num; ++i)
-            draw_text(&state, state.lines[i], 0, i*state.font_size, BLACK);
-        draw_cursor(&state);
+
+        BeginMode2D(state.camera);
+            for (int i = 0; i < state.lines_num; ++i)
+                draw_text(&state, state.lines[i], 0, i*state.font_size, BLACK);
+            draw_cursor(&state);
+        EndMode2D();
+
         draw_hud(&state);
         EndDrawing();
     }
@@ -111,6 +119,12 @@ void state_init(LameState *state, const char *filename)
     state->line = -1;
     state->lines_capacity = 100;
     state->lines = calloc(state->lines_capacity, sizeof(Line));
+    state->line_scroll = 1;
+
+    state->camera.offset = (Vector2){ 0.0f, 0.0f };
+    state->camera.target = (Vector2){ 0.0f, 0.0f };
+    state->camera.rotation = 0.0f;
+    state->camera.zoom = 1.0f;
 
     if (FileExists(state->filename)) {
         load_file(state);
@@ -206,6 +220,12 @@ void handle_cursor_movement(LameState *state)
             int line_above_len = strlen(state->lines[state->line - 1]);
             --state->line;
 
+            --state->line_scroll;
+            if (state->line_scroll <= 0) {
+                state->camera.target.y -= state->font_size;
+                state->line_scroll = 1;
+            }
+
             if (state->cursor > line_above_len)
                 state->cursor = line_above_len;
         } else
@@ -214,12 +234,23 @@ void handle_cursor_movement(LameState *state)
         if (state->lines[state->line + 1]) {
             int line_below_len = strlen(state->lines[state->line + 1]);
             ++state->line;
+            ++state->line_scroll;
+            if (state->line_scroll > get_number_lines_on_screen(state)) {
+                state->camera.target.y += state->font_size;
+                --state->line_scroll;
+            }
 
             if (state->cursor > line_below_len)
                 state->cursor = line_below_len;
         } else
             state->cursor = strlen(state->lines[state->line]);
     }
+}
+
+int get_number_lines_on_screen(LameState *state)
+{
+    int num_lines = GetScreenHeight()/state->font_size;
+    return num_lines - 1;
 }
 
 void new_line(LameState *state)
@@ -318,5 +349,6 @@ void draw_cursor(LameState *state)
 
 void draw_hud(LameState *state)
 {
+    DrawRectangle(0, GetScreenHeight() - state->font_size, GetScreenWidth(), state->font_size, GRAY);
     draw_text(state, TextFormat((state->dirty? "%s [*]" : "%s"), state->filename), 0, GetScreenHeight() - state->font_size, BLACK);
 }
