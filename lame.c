@@ -350,5 +350,7 @@ void draw_cursor(LameState *state)
 void draw_hud(LameState *state)
 {
     DrawRectangle(0, GetScreenHeight() - state->font_size, GetScreenWidth(), state->font_size, GRAY);
-    draw_text(state, TextFormat((state->dirty? "%s [*]" : "%s"), state->filename), 0, GetScreenHeight() - state->font_size, BLACK);
+    const char *line_information = TextFormat("%d:%d", state->line + 1, state->cursor + 1);
+    const char *text = TextFormat((state->dirty? "%s [*] | %s" : "%s | %s"), state->filename, line_information);
+    draw_text(state, text, 0, GetScreenHeight() - state->font_size, BLACK);
 }
