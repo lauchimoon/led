@@ -52,6 +52,8 @@ void append_char_cursor(LameState *, int);
 void delete_line(LameState *);
 void append_tab(LameState *);
 void write_file(LameState *);
+void move_to_start(LameState *);
+void move_to_end(LameState *);
 
 void draw_text(LameState *, const char *, int, int, Color);
 void draw_cursor(LameState *);
@@ -194,6 +196,12 @@ void handle_editor_events(LameState *state)
     if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S))
         write_file(state);
 
+    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_ZERO))
+        move_to_start(state);
+
+    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_E))
+        move_to_end(state);
+
     if (state->cursor < 0)
         state->cursor = 0;
 
@@ -331,6 +339,17 @@ void write_file(LameState *state)
         fprintf(f, "%s\n", state->lines[i]);
 
     fclose(f);
+}
+
+void move_to_start(LameState *state)
+{
+    state->cursor = 0;
+}
+
+void move_to_end(LameState *state)
+{
+    int line_len = strlen(state->lines[state->line]);
+    state->cursor = line_len;
 }
 
 void draw_text(LameState *state, const char *text, int x, int y, Color color)
