@@ -8,6 +8,7 @@ A rudimentary text editor made with [raylib](https://github.com/raysan5/raylib)
 - Ctrl + Z: Undo (limited for now)
 - Ctrl + K: Increment font size
 - Ctrl + J: Decrement font size
+- Ctrl + T + <1, 2>: Change theme (1 is dark, 2 is white)
 
 ## Usage
 ```

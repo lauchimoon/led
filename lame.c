@@ -1,4 +1,7 @@
 #include "raylib.h"
+
+#include "theme.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -45,6 +48,7 @@ typedef struct LameState {
     const char *title;
     const char *filename;
     bool exit;
+    LameTheme theme;
 
     Line *lines;
     int lines_capacity;
@@ -128,11 +132,11 @@ int main(int argc, char **argv)
         handle_cursor_movement(&state);
 
         BeginDrawing();
-        ClearBackground(RAYWHITE);
+        ClearBackground(state.theme.background_color);
 
         BeginMode2D(state.camera);
             for (int i = 0; i < state.lines_num; ++i)
-                draw_text(&state, state.lines[i], 0, i*state.font_size, BLACK);
+                draw_text(&state, state.lines[i], 0, i*state.font_size, state.theme.text_color);
             draw_cursor(&state);
         EndMode2D();
 
@@ -188,6 +192,7 @@ void state_init(LameState *state, const char *filename)
 
     state->font_size = FONT_SIZE_INIT;
     state->font = LoadFontEx("fonts/GeistMono-Regular.ttf", state->font_size, NULL, 95);
+    state->theme = themes[0];
 
     state->line = -1;
     state->lines_capacity = 100;
@@ -268,6 +273,11 @@ void handle_editor_events(LameState *state)
             resize_font(state, RESIZE_ACTION_INCREASE);
         else if (IsKeyPressed(KEY_J))
             resize_font(state, RESIZE_ACTION_DECREASE);
+        else if (IsKeyDown(KEY_T))
+            if (IsKeyPressed(KEY_ONE))
+                state->theme = themes[0];
+            else if (IsKeyPressed(KEY_TWO))
+                state->theme = themes[1];
     }
 
     if (IsKeyDown(KEY_BACKSPACE) && state->cursor > 0 &&
@@ -504,13 +514,13 @@ void draw_cursor(LameState *state)
     GlyphInfo glyph = GetGlyphInfo(state->font, ch);
 
     Rectangle cursor_rec = { state->cursor*(glyph.advanceX + 1), state->line*state->font_size, glyph.advanceX, state->font_size };
-    DrawRectangleRec(cursor_rec, Fade(BLACK, 0.5f));
+    DrawRectangleRec(cursor_rec, Fade(state->theme.text_color, 0.5f));
 }
 
 void draw_hud(LameState *state)
 {
-    DrawRectangle(0, GetScreenHeight() - state->font_size, GetScreenWidth(), state->font_size, GRAY);
+    DrawRectangle(0, GetScreenHeight() - state->font_size, GetScreenWidth(), state->font_size, state->theme.hud_color);
     const char *line_information = TextFormat("%d:%d", state->line + 1, state->cursor + 1);
     const char *text = TextFormat((state->dirty? "%s [*] | %s" : "%s | %s"), state->filename, line_information);
-    draw_text(state, text, 0, GetScreenHeight() - state->font_size, BLACK);
+    draw_text(state, text, 0, GetScreenHeight() - state->font_size, state->theme.text_color);
 }
