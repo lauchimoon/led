@@ -12,9 +12,19 @@
 
 #define REPEAT_COOLDOWN 3
 
+#define FONT_SIZE_INIT     24
+#define FONT_RESIZE_FACTOR 4
+#define FONT_RESIZE_MIN    FONT_SIZE_INIT/2
+#define FONT_RESIZE_MAX    FONT_SIZE_INIT*2
+
 enum {
-    ACTION_DELETE_CHAR = 0,
-    ACTION_APPEND_CHAR,
+    UNDO_ACTION_DELETE_CHAR = 0,
+    UNDO_ACTION_APPEND_CHAR,
+};
+
+enum {
+    RESIZE_ACTION_INCREASE = 0,
+    RESIZE_ACTION_DECREASE,
 };
 
 typedef char *Line;
@@ -77,6 +87,7 @@ void delete_line(LameState *);
 void append_tab(LameState *);
 void write_file(LameState *);
 void undo(LameState *);
+void resize_font(LameState *, int action);
 
 void move_to_start(LameState *);
 void move_to_end(LameState *);
@@ -175,7 +186,7 @@ void state_init(LameState *state, const char *filename)
     state->cursor = 0;
     state->repeat_cooldown = 0;
 
-    state->font_size = 24;
+    state->font_size = FONT_SIZE_INIT;
     state->font = LoadFontEx("fonts/GeistMono-Regular.ttf", state->font_size, NULL, 95);
 
     state->line = -1;
@@ -253,6 +264,10 @@ void handle_editor_events(LameState *state)
             write_file(state);
         else if (IsKeyPressed(KEY_Z))
             undo(state);
+        else if (IsKeyPressed(KEY_K))
+            resize_font(state, RESIZE_ACTION_INCREASE);
+        else if (IsKeyPressed(KEY_J))
+            resize_font(state, RESIZE_ACTION_DECREASE);
     }
 
     if (IsKeyDown(KEY_BACKSPACE) && state->cursor > 0 &&
@@ -354,7 +369,7 @@ void delete_char_cursor(LameState *state, bool undo)
 
     if (undo) {
         UndoAction action = {
-            .type = ACTION_DELETE_CHAR,
+            .type = UNDO_ACTION_DELETE_CHAR,
             .line = state->line,
             .cursor = state->cursor,
             .ch = line[state->cursor - 1],
@@ -376,7 +391,7 @@ void append_char_cursor(LameState *state, int c, bool undo)
 
     if (undo) {
         UndoAction action = {
-            .type = ACTION_APPEND_CHAR,
+            .type = UNDO_ACTION_APPEND_CHAR,
             .line = state->line,
             .cursor = state->cursor,
             .ch = c,
@@ -437,15 +452,34 @@ void undo(LameState *state)
     state->cursor = action.cursor - 1;
 
     switch (action.type) {
-        case ACTION_DELETE_CHAR:
+        case UNDO_ACTION_DELETE_CHAR:
             append_char_cursor(state, action.ch, false);
             break;
-        case ACTION_APPEND_CHAR:
+        case UNDO_ACTION_APPEND_CHAR:
             delete_char_cursor(state, false);
             break;
     }
 
     state->undo = undo_delete(state->undo);
+}
+
+void resize_font(LameState *state, int action)
+{
+    int sign = (action == RESIZE_ACTION_INCREASE)? 1 : -1;
+    int resize_factor = sign*FONT_RESIZE_FACTOR;
+    state->font_size += resize_factor;
+
+    if (state->font_size < FONT_RESIZE_MIN) {
+        state->font_size = FONT_RESIZE_MIN;
+        return;
+    }
+    if (state->font_size > FONT_RESIZE_MAX) {
+        state->font_size = FONT_RESIZE_MAX;
+        return;
+    }
+
+    UnloadFont(state->font);
+    state->font = LoadFontEx("fonts/GeistMono-Regular.ttf", state->font_size, NULL, 95);
 }
 
 void move_to_start(LameState *state)
