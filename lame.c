@@ -12,7 +12,24 @@
 
 #define REPEAT_COOLDOWN 3
 
+enum {
+    ACTION_DELETE_CHAR = 0,
+    ACTION_APPEND_CHAR,
+};
+
 typedef char *Line;
+
+typedef struct UndoAction {
+    int type;
+    int line;
+    int cursor;
+    char ch;
+} UndoAction;
+
+typedef struct _UndoBuffer {
+    UndoAction action;
+    struct _UndoBuffer *next;
+} UndoBuffer;
 
 typedef struct LameState {
     const char *title;
@@ -34,7 +51,14 @@ typedef struct LameState {
     bool dirty;
 
     Camera2D camera;
+
+    UndoBuffer *undo;
 } LameState;
+
+UndoBuffer *undo_init(void);
+UndoBuffer *undo_append(UndoBuffer *, UndoAction);
+UndoBuffer *undo_delete(UndoBuffer *);
+void undo_free(UndoBuffer *);
 
 void state_init(LameState *, const char *);
 void load_file(LameState *);
@@ -47,11 +71,13 @@ void handle_cursor_movement(LameState *);
 int get_number_lines_on_screen(LameState *);
 
 void new_line(LameState *);
-void delete_char_cursor(LameState *);
-void append_char_cursor(LameState *, int);
+void delete_char_cursor(LameState *, bool);
+void append_char_cursor(LameState *, int, bool);
 void delete_line(LameState *);
 void append_tab(LameState *);
 void write_file(LameState *);
+void undo(LameState *);
+
 void move_to_start(LameState *);
 void move_to_end(LameState *);
 
@@ -108,6 +134,40 @@ int main(int argc, char **argv)
     return 0;
 }
 
+UndoBuffer *undo_init(void)
+{
+    return NULL;
+}
+
+UndoBuffer *undo_append(UndoBuffer *head, UndoAction action)
+{
+    UndoBuffer *node = malloc(sizeof(UndoBuffer));
+    node->action = action;
+    node->next = head;
+    return node;
+}
+
+UndoBuffer *undo_delete(UndoBuffer *head)
+{
+    if (!head)
+      return NULL;
+
+    UndoBuffer *node = head;
+    head = head->next;
+    free(node);
+    return head;
+}
+
+void undo_free(UndoBuffer *head)
+{
+    UndoBuffer *node = head;
+    while (node) {
+        UndoBuffer *tmp = node;
+        node = node->next;
+        free(tmp);
+    }
+}
+
 void state_init(LameState *state, const char *filename)
 {
     state->filename = filename;
@@ -127,6 +187,8 @@ void state_init(LameState *state, const char *filename)
     state->camera.target = (Vector2){ 0.0f, 0.0f };
     state->camera.rotation = 0.0f;
     state->camera.zoom = 1.0f;
+
+    state->undo = undo_init();
 
     if (FileExists(state->filename)) {
         load_file(state);
@@ -170,6 +232,8 @@ void state_deinit(LameState *state)
     state->lines_num = 0;
     state->line = 0;
     state->cursor = 0;
+
+    undo_free(state->undo);
 }
 
 bool any_key_pressed(int *key)
@@ -180,21 +244,23 @@ bool any_key_pressed(int *key)
 
 void handle_editor_events(LameState *state)
 {
-    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_Q))
-        state->exit = true;
+    if (IsKeyDown(KEY_LEFT_CONTROL)) {
+        if (IsKeyPressed(KEY_Q))
+            state->exit = true;
+        else if (IsKeyPressed(KEY_D))
+            delete_line(state);
+        else if (IsKeyPressed(KEY_S))
+            write_file(state);
+        else if (IsKeyPressed(KEY_Z))
+            undo(state);
+    }
 
     if (IsKeyDown(KEY_BACKSPACE) && state->cursor > 0 &&
             state->repeat_cooldown % REPEAT_COOLDOWN == 0)
-        delete_char_cursor(state);
-
-    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_D))
-        delete_line(state);
+        delete_char_cursor(state, true);
 
     if (IsKeyPressed(KEY_TAB))
         append_tab(state);
-
-    if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S))
-        write_file(state);
 
     if (state->cursor < 0)
         state->cursor = 0;
@@ -205,7 +271,7 @@ void handle_editor_events(LameState *state)
         if (key == KEY_ENTER)
             new_line(state);
         else if (c >= ' ' && c <= '~')
-            append_char_cursor(state, c);
+            append_char_cursor(state, c, true);
     }
 }
 
@@ -253,7 +319,6 @@ void handle_cursor_movement(LameState *state)
 
     if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_E))
         move_to_end(state);
-
 }
 
 int get_number_lines_on_screen(LameState *state)
@@ -280,12 +345,22 @@ void new_line(LameState *state)
     state->cursor = 0;
 }
 
-void delete_char_cursor(LameState *state)
+void delete_char_cursor(LameState *state, bool undo)
 {
     Line line = state->lines[state->line];
     int line_len = strlen(line);
     if (line_len < 1)
         return;
+
+    if (undo) {
+        UndoAction action = {
+            .type = ACTION_DELETE_CHAR,
+            .line = state->line,
+            .cursor = state->cursor,
+            .ch = line[state->cursor - 1],
+        };
+        state->undo = undo_append(state->undo, action);
+    }
 
     for (int i = state->cursor - 1; i < line_len; ++i)
         line[i] = line[i + 1];
@@ -294,10 +369,20 @@ void delete_char_cursor(LameState *state)
     state->dirty = true;
 }
 
-void append_char_cursor(LameState *state, int c)
+void append_char_cursor(LameState *state, int c, bool undo)
 {
     Line line = state->lines[state->line];
     int line_len = strlen(line);
+
+    if (undo) {
+        UndoAction action = {
+            .type = ACTION_APPEND_CHAR,
+            .line = state->line,
+            .cursor = state->cursor,
+            .ch = c,
+        };
+        state->undo = undo_append(state->undo, action);
+    }
 
     for (int i = line_len; i > state->cursor; --i)
         line[i] = line[i - 1];
@@ -327,7 +412,7 @@ void delete_line(LameState *state)
 void append_tab(LameState *state)
 {
     for (int i = 0; i < 4; ++i)
-        append_char_cursor(state, ' ');
+        append_char_cursor(state, ' ', true);
 
     state->dirty = true;
 }
@@ -340,6 +425,27 @@ void write_file(LameState *state)
         fprintf(f, "%s\n", state->lines[i]);
 
     fclose(f);
+}
+
+void undo(LameState *state)
+{
+    if (!state->undo)
+        return;
+
+    UndoAction action = state->undo->action;
+    state->line = action.line;
+    state->cursor = action.cursor - 1;
+
+    switch (action.type) {
+        case ACTION_DELETE_CHAR:
+            append_char_cursor(state, action.ch, false);
+            break;
+        case ACTION_APPEND_CHAR:
+            delete_char_cursor(state, false);
+            break;
+    }
+
+    state->undo = undo_delete(state->undo);
 }
 
 void move_to_start(LameState *state)
