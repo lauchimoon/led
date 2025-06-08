@@ -1,5 +1,6 @@
 # lame
 A rudimentary text editor made with [raylib](https://github.com/raysan5/raylib)
+![](https://raw.githubusercontent.com/lauchimoon/lame/refs/heads/main/assets/ss.png)
 
 ## Keybinds
 - Ctrl + Q: Exit editor
