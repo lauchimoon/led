@@ -1,6 +1,7 @@
 #include "raylib.h"
 
 #include "theme.h"
+#include "fonts/GeistMono-Regular.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -191,7 +192,7 @@ void state_init(LedState *state, const char *filename)
     state->repeat_cooldown = 0;
 
     state->font_size = FONT_SIZE_INIT;
-    state->font = LoadFontEx("fonts/GeistMono-Regular.ttf", state->font_size, NULL, 95);
+    state->font = LoadFontFromMemory(".ttf", GeistMono_Regular_ttf, GeistMono_Regular_ttf_len, state->font_size, NULL, 95);
     state->theme = themes[0];
 
     state->line = -1;
@@ -489,7 +490,7 @@ void resize_font(LedState *state, int action)
     }
 
     UnloadFont(state->font);
-    state->font = LoadFontEx("fonts/GeistMono-Regular.ttf", state->font_size, NULL, 95);
+    state->font = LoadFontFromMemory(".ttf", GeistMono_Regular_ttf, GeistMono_Regular_ttf_len, state->font_size, NULL, 95);
 }
 
 void move_to_start(LedState *state)
