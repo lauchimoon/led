@@ -1,6 +1,6 @@
 # led (lauchi's editor)
 A rudimentary text editor made with [raylib](https://github.com/raysan5/raylib)
-![](https://raw.githubusercontent.com/lauchimoon/lame/refs/heads/main/assets/ss.png)
+![](https://raw.githubusercontent.com/lauchimoon/led/refs/heads/main/assets/ss.png)
 
 ## Keybinds
 - Ctrl + Q: Exit editor
