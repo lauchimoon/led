@@ -14,7 +14,7 @@ A rudimentary text editor made with [raylib](https://github.com/raysan5/raylib)
 ## Usage
 ```
 $ git clone https://github.com/lauchimoon/led.git
-$ cd lame
+$ cd led
 $ make
 $ ./led <file>
 ```
