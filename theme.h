@@ -1,17 +1,17 @@
-#ifndef LAME_THEME
-#define LAME_THEME
+#ifndef LED_THEME
+#define LED_THEME
 
-typedef struct LameTheme {
+typedef struct LedTheme {
     Color background_color;
     Color text_color;
     Color hud_color;
-} LameTheme;
+} LedTheme;
 
 #define NUM_THEMES 2
 
-LameTheme themes[NUM_THEMES] = {
-    (LameTheme){ (Color){ 26, 26, 26, 255 }, RAYWHITE, DARKGRAY },
-    (LameTheme){ RAYWHITE, BLACK, GRAY },
+LedTheme themes[NUM_THEMES] = {
+    (LedTheme){ (Color){ 26, 26, 26, 255 }, RAYWHITE, DARKGRAY },
+    (LedTheme){ RAYWHITE, BLACK, GRAY },
 };
 
-#endif // LAME_THEME
+#endif // LED_THEME

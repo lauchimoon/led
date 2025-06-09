@@ -44,11 +44,11 @@ typedef struct _UndoBuffer {
     struct _UndoBuffer *next;
 } UndoBuffer;
 
-typedef struct LameState {
+typedef struct LedState {
     const char *title;
     const char *filename;
     bool exit;
-    LameTheme theme;
+    LedTheme theme;
 
     Line *lines;
     int lines_capacity;
@@ -67,50 +67,50 @@ typedef struct LameState {
     Camera2D camera;
 
     UndoBuffer *undo;
-} LameState;
+} LedState;
 
 UndoBuffer *undo_init(void);
 UndoBuffer *undo_append(UndoBuffer *, UndoAction);
 UndoBuffer *undo_delete(UndoBuffer *);
 void undo_free(UndoBuffer *);
 
-void state_init(LameState *, const char *);
-void load_file(LameState *);
-void state_deinit(LameState *);
+void state_init(LedState *, const char *);
+void load_file(LedState *);
+void state_deinit(LedState *);
 
 bool any_key_pressed(int *);
 
-void handle_editor_events(LameState *);
-void handle_cursor_movement(LameState *);
-int get_number_lines_on_screen(LameState *);
+void handle_editor_events(LedState *);
+void handle_cursor_movement(LedState *);
+int get_number_lines_on_screen(LedState *);
 
-void new_line(LameState *);
-void delete_char_cursor(LameState *, bool);
-void append_char_cursor(LameState *, int, bool);
-void delete_line(LameState *);
-void append_tab(LameState *);
-void write_file(LameState *);
-void undo(LameState *);
-void resize_font(LameState *, int action);
+void new_line(LedState *);
+void delete_char_cursor(LedState *, bool);
+void append_char_cursor(LedState *, int, bool);
+void delete_line(LedState *);
+void append_tab(LedState *);
+void write_file(LedState *);
+void undo(LedState *);
+void resize_font(LedState *, int action);
 
-void move_to_start(LameState *);
-void move_to_end(LameState *);
+void move_to_start(LedState *);
+void move_to_end(LedState *);
 
-void draw_text(LameState *, const char *, int, int, Color);
-void draw_cursor(LameState *);
-void draw_hud(LameState *);
+void draw_text(LedState *, const char *, int, int, Color);
+void draw_cursor(LedState *);
+void draw_hud(LedState *);
 
 int main(int argc, char **argv)
 {
     if (argc < 2) {
-        printf("usage: lame <file>\n");
+        printf("usage: led <file>\n");
         return 1;
     }
 
     const char *filename = argv[1];
 
-    LameState state = {
-        .title = TextFormat("lame - %s", filename),
+    LedState state = {
+        .title = TextFormat("led - %s", filename),
         .exit  = false,
     };
 
@@ -183,7 +183,7 @@ void undo_free(UndoBuffer *head)
     }
 }
 
-void state_init(LameState *state, const char *filename)
+void state_init(LedState *state, const char *filename)
 {
     state->filename = filename;
 
@@ -215,7 +215,7 @@ void state_init(LameState *state, const char *filename)
     new_line(state);
 }
 
-void load_file(LameState *state)
+void load_file(LedState *state)
 {
     FILE *f = fopen(state->filename, "r");
     char buffer[LINE_SIZE] = { 0 };
@@ -235,7 +235,7 @@ void load_file(LameState *state)
     fclose(f);
 }
 
-void state_deinit(LameState *state)
+void state_deinit(LedState *state)
 {
     UnloadFont(state->font);
     state->font_size = 0;
@@ -258,7 +258,7 @@ bool any_key_pressed(int *key)
     return *key >= ' ' && *key <= KEY_KB_MENU;
 }
 
-void handle_editor_events(LameState *state)
+void handle_editor_events(LedState *state)
 {
     if (IsKeyDown(KEY_LEFT_CONTROL)) {
         if (IsKeyPressed(KEY_Q))
@@ -300,7 +300,7 @@ void handle_editor_events(LameState *state)
     }
 }
 
-void handle_cursor_movement(LameState *state)
+void handle_cursor_movement(LedState *state)
 {
     int current_line_len = strlen(state->lines[state->line]);
 
@@ -346,13 +346,13 @@ void handle_cursor_movement(LameState *state)
         move_to_end(state);
 }
 
-int get_number_lines_on_screen(LameState *state)
+int get_number_lines_on_screen(LedState *state)
 {
     int num_lines = GetScreenHeight()/state->font_size;
     return num_lines - 1;
 }
 
-void new_line(LameState *state)
+void new_line(LedState *state)
 {
     Line new = calloc(LINE_SIZE, sizeof(char));
     ++state->lines_num;
@@ -370,7 +370,7 @@ void new_line(LameState *state)
     state->cursor = 0;
 }
 
-void delete_char_cursor(LameState *state, bool undo)
+void delete_char_cursor(LedState *state, bool undo)
 {
     Line line = state->lines[state->line];
     int line_len = strlen(line);
@@ -394,7 +394,7 @@ void delete_char_cursor(LameState *state, bool undo)
     state->dirty = true;
 }
 
-void append_char_cursor(LameState *state, int c, bool undo)
+void append_char_cursor(LedState *state, int c, bool undo)
 {
     Line line = state->lines[state->line];
     int line_len = strlen(line);
@@ -416,7 +416,7 @@ void append_char_cursor(LameState *state, int c, bool undo)
     state->dirty = true;
 }
 
-void delete_line(LameState *state)
+void delete_line(LedState *state)
 {
     Line line = state->lines[state->line];
     if (state->lines_num == 1) {
@@ -434,7 +434,7 @@ void delete_line(LameState *state)
     state->dirty = true;
 }
 
-void append_tab(LameState *state)
+void append_tab(LedState *state)
 {
     for (int i = 0; i < 4; ++i)
         append_char_cursor(state, ' ', true);
@@ -442,7 +442,7 @@ void append_tab(LameState *state)
     state->dirty = true;
 }
 
-void write_file(LameState *state)
+void write_file(LedState *state)
 {
     state->dirty = false;
     FILE *f = fopen(state->filename, "w");
@@ -452,7 +452,7 @@ void write_file(LameState *state)
     fclose(f);
 }
 
-void undo(LameState *state)
+void undo(LedState *state)
 {
     if (!state->undo)
         return;
@@ -473,7 +473,7 @@ void undo(LameState *state)
     state->undo = undo_delete(state->undo);
 }
 
-void resize_font(LameState *state, int action)
+void resize_font(LedState *state, int action)
 {
     int sign = (action == RESIZE_ACTION_INCREASE)? 1 : -1;
     int resize_factor = sign*FONT_RESIZE_FACTOR;
@@ -492,23 +492,23 @@ void resize_font(LameState *state, int action)
     state->font = LoadFontEx("fonts/GeistMono-Regular.ttf", state->font_size, NULL, 95);
 }
 
-void move_to_start(LameState *state)
+void move_to_start(LedState *state)
 {
     state->cursor = 0;
 }
 
-void move_to_end(LameState *state)
+void move_to_end(LedState *state)
 {
     int line_len = strlen(state->lines[state->line]);
     state->cursor = line_len;
 }
 
-void draw_text(LameState *state, const char *text, int x, int y, Color color)
+void draw_text(LedState *state, const char *text, int x, int y, Color color)
 {
     DrawTextEx(state->font, text, (Vector2){x, y}, (float)state->font_size, 1.0f, color);
 }
 
-void draw_cursor(LameState *state)
+void draw_cursor(LedState *state)
 {
     char ch = state->lines[state->line][state->cursor - 1];
     GlyphInfo glyph = GetGlyphInfo(state->font, ch);
@@ -517,7 +517,7 @@ void draw_cursor(LameState *state)
     DrawRectangleRec(cursor_rec, Fade(state->theme.text_color, 0.5f));
 }
 
-void draw_hud(LameState *state)
+void draw_hud(LedState *state)
 {
     DrawRectangle(0, GetScreenHeight() - state->font_size, GetScreenWidth(), state->font_size, state->theme.hud_color);
     const char *line_information = TextFormat("%d:%d", state->line + 1, state->cursor + 1);

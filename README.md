@@ -1,4 +1,4 @@
-# lame
+# led (lauchi's editor)
 A rudimentary text editor made with [raylib](https://github.com/raysan5/raylib)
 ![](https://raw.githubusercontent.com/lauchimoon/lame/refs/heads/main/assets/ss.png)
 
@@ -13,9 +13,9 @@ A rudimentary text editor made with [raylib](https://github.com/raysan5/raylib)
 
 ## Usage
 ```
-$ git clone https://github.com/lauchimoon/lame.git
+$ git clone https://github.com/lauchimoon/led.git
 $ cd lame
 $ make
-$ ./lame <file>
+$ ./led <file>
 ```
-If `<file>` doesn't exist, `lame` will create it.
+If `<file>` doesn't exist, `led` will create it.

@@ -1,6 +1,6 @@
 CC=gcc
-SRC=lame.c
-OUT=lame
+SRC=led.c
+OUT=led
 LDLIBS=-Llib/ -lraylib -lGL -lm -lpthread -ldl
 INCLUDE=-Iinclude/
 CFLAGS=-g
