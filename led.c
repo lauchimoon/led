@@ -362,6 +362,7 @@ void new_line(LedState *state)
         state->lines[i] = state->lines[i - 1];
 
     ++state->line;
+    ++state->line_scroll;
     if (state->lines_num >= state->lines_capacity/2) {
         state->lines_capacity *= 2;
         state->lines = realloc(state->lines, state->lines_capacity*sizeof(Line));
