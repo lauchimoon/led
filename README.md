@@ -3,6 +3,8 @@ A rudimentary text editor made with [raylib](https://github.com/raysan5/raylib)
 ![](https://raw.githubusercontent.com/lauchimoon/led/refs/heads/main/assets/ss.png)
 
 ## Keybinds
+- Arrow keys: Movement
+- Page Up, Page Down: Scroll
 - Ctrl + Q: Exit editor
 - Ctrl + D: Delete current line
 - Ctrl + S: Save buffer
