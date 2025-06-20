@@ -346,11 +346,10 @@ void handle_cursor_movement(LedState *state)
         state->line_scroll = 1;
         state->line += lines_on_screen;
 
-        if (state->line > state->lines_num) {
+        if (state->line > state->lines_num)
             state->line = state->lines_num - 1;
-            state->cursor = strlen(state->lines[state->line]);
-        }
 
+        state->cursor = strlen(state->lines[state->line]);
         state->camera.target.y = state->font_size*state->line;
     }
 
@@ -359,11 +358,10 @@ void handle_cursor_movement(LedState *state)
         state->line_scroll = 1;
         state->line -= lines_on_screen;
 
-        if (state->line < 0) {
+        if (state->line < 0)
             state->line = 0;
-            state->cursor = 0;
-        }
 
+        state->cursor = strlen(state->lines[state->line]);
         state->camera.target.y = state->font_size*state->line;
     }
 
