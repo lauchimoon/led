@@ -354,6 +354,19 @@ void handle_cursor_movement(LedState *state)
         state->camera.target.y = state->font_size*state->line;
     }
 
+    if (IsKeyPressed(KEY_PAGE_UP)) {
+        int lines_on_screen = get_number_lines_on_screen(state);
+        state->line_scroll = 1;
+        state->line -= lines_on_screen;
+
+        if (state->line < 0) {
+            state->line = 0;
+            state->cursor = 0;
+        }
+
+        state->camera.target.y = state->font_size*state->line;
+    }
+
     if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_ZERO))
         move_to_start(state);
 
