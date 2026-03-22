@@ -291,13 +291,13 @@ void handle_editor_events(LedState *state)
     if (state->cursor < 0)
         state->cursor = 0;
 
-    int key;
-    if (any_key_pressed(&key)) {
-        int c = GetCharPressed();
-        if (key == KEY_ENTER)
+    int c = GetCharPressed();
+    while (c > 0) {
+        if (c == KEY_ENTER)
             new_line(state);
         else if (c >= ' ' && c <= '~')
             append_char_cursor(state, c, true);
+        c = GetCharPressed();
     }
 }
 
