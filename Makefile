@@ -1,9 +1,20 @@
-CC=gcc
-SRC=led.c
-OUT=led
-LDLIBS=-Llib/ -lraylib -lGL -lm -lpthread -ldl
-INCLUDE=-Iinclude/
-CFLAGS=-g
+CC     ?= gcc
+SRC    := led.c
+OUT    := led
+CFLAGS ?= -g
 
-default:
-	$(CC) $(SRC) $(LDLIBS) $(INCLUDE) $(CFLAGS) -o $(OUT)
+# Assumes as built from source code
+RAYLIB_PATH ?= 
+RAYLIB_LIBS := -L$(RAYLIB_PATH)/src -lraylib
+
+INCLUDE = -I$(RAYLIB_PATH)/src
+LDLIBS  = $(RAYLIB_LIBS) -lGL -lm -lpthread -ldl -lX11
+
+default: $(OUT)
+
+$(OUT): $(SRC)
+	$(CC) $(SRC) $(CFLAGS) $(INCLUDE) $(LDLIBS) -o $(OUT)
+
+.PHONY: default clean
+clean:
+	rm $(OUT)
