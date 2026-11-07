@@ -106,5 +106,7 @@ void copy_line(LedState *state)
 
 void paste_line(LedState *state)
 {
-    printf("I pasted '%s'.\n", state->copy_buffer);
+    new_line(state);
+    int n = strlen(state->copy_buffer);
+    strncpy(state->lines[state->line], state->copy_buffer, n);
 }
