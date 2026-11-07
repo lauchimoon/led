@@ -68,36 +68,36 @@ typedef struct LedState {
 } LedState;
 
 UndoBuffer *undo_init(void);
-UndoBuffer *undo_append(UndoBuffer *, UndoAction);
-UndoBuffer *undo_delete(UndoBuffer *);
-void undo_free(UndoBuffer *);
+UndoBuffer *undo_append(UndoBuffer *head, UndoAction action);
+UndoBuffer *undo_delete(UndoBuffer *head);
+void undo_free(UndoBuffer *head);
 
-void state_init(LedState *, const char *);
-void load_file(LedState *);
-void state_deinit(LedState *);
+void state_init(LedState *state, const char *filename);
+void load_file(LedState *state);
+void state_deinit(LedState *state);
 
-bool any_key_pressed(int *);
-bool key_pressed_or_repeat(int);
+bool any_key_pressed(int *key);
+bool key_pressed_or_repeat(int key);
 
-void handle_editor_events(LedState *);
-void handle_cursor_movement(LedState *);
-int get_number_lines_on_screen(LedState *);
+void handle_editor_events(LedState *state);
+void handle_cursor_movement(LedState *state);
+int get_number_lines_on_screen(LedState *state);
 
-void new_line(LedState *);
-void delete_char_cursor(LedState *, bool);
-void append_char_cursor(LedState *, int, bool);
-void delete_line(LedState *);
-void append_tab(LedState *);
-void write_file(LedState *);
-void undo(LedState *);
-void resize_font(LedState *, int action);
+void new_line(LedState *state);
+void delete_char_cursor(LedState *state, bool undo);
+void append_char_cursor(LedState *state, int c, bool undo);
+void delete_line(LedState *state);
+void append_tab(LedState *state);
+void write_file(LedState *state);
+void undo(LedState *state);
+void resize_font(LedState *state, int action);
 
-void move_to_start(LedState *);
-void move_to_end(LedState *);
+void move_to_start(LedState *state);
+void move_to_end(LedState *state);
 
-void draw_text(LedState *, const char *, int, int, Color);
-void draw_cursor(LedState *);
-void draw_hud(LedState *);
+void draw_text(LedState *state, const char *text, int x, int y, Color color);
+void draw_cursor(LedState *state);
+void draw_hud(LedState *state);
 
 int main(int argc, char **argv)
 {
