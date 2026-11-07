@@ -1,3 +1,4 @@
 led
 a.out
+*.o
 text.txt

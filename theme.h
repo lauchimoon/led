@@ -1,6 +1,8 @@
 #ifndef LED_THEME
 #define LED_THEME
 
+#include "raylib.h"
+
 typedef struct LedTheme {
     Color background_color;
     Color text_color;
@@ -9,9 +11,6 @@ typedef struct LedTheme {
 
 #define NUM_THEMES 2
 
-LedTheme themes[NUM_THEMES] = {
-    (LedTheme){ (Color){ 26, 26, 26, 255 }, RAYWHITE, DARKGRAY },
-    (LedTheme){ RAYWHITE, BLACK, GRAY },
-};
+extern const LedTheme themes[NUM_THEMES];
 
 #endif // LED_THEME
