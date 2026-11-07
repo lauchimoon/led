@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 void new_line(LedState *state)
 {
@@ -94,4 +95,16 @@ void append_tab(LedState *state)
         append_char_cursor(state, ' ', true);
 
     state->dirty = true;
+}
+
+void copy_line(LedState *state)
+{
+    memset(state->copy_buffer, 0, LINE_SIZE);
+    int n = strlen(state->lines[state->line]);
+    strncpy(state->copy_buffer, state->lines[state->line], n);
+}
+
+void paste_line(LedState *state)
+{
+    printf("I pasted '%s'.\n", state->copy_buffer);
 }

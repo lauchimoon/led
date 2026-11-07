@@ -25,7 +25,10 @@ void handle_editor_events(LedState *state)
                 state->theme = themes[0];
             else if (IsKeyPressed(KEY_TWO))
                 state->theme = themes[1];
-        }
+        } else if (IsKeyPressed(KEY_C))
+            copy_line(state);
+        else if (IsKeyPressed(KEY_V))
+            paste_line(state);
     }
 
     if (key_pressed_or_repeat(KEY_BACKSPACE) && state->cursor > 0)

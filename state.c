@@ -29,6 +29,7 @@ void state_init(LedState *state, const char *filename)
     state->camera.zoom = 1.0f;
 
     state->undo = undo_init();
+    state->copy_buffer = calloc(LINE_SIZE, sizeof(char));
 
     if (FileExists(state->filename)) {
         load_file(state);
@@ -92,4 +93,5 @@ void state_deinit(LedState *state)
     state->cursor = 0;
 
     undo_free(state->undo);
+    free(state->copy_buffer);
 }

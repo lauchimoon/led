@@ -38,6 +38,7 @@ typedef struct LedState {
     Camera2D camera;
 
     UndoBuffer *undo;
+    Line copy_buffer;
 } LedState;
 
 void state_init(LedState *state, const char *filename);

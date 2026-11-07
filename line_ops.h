@@ -8,5 +8,7 @@ void delete_char_cursor(LedState *state, bool undo);
 void append_char_cursor(LedState *state, int c, bool undo);
 void delete_line(LedState *state);
 void append_tab(LedState *state);
+void copy_line(LedState *state);
+void paste_line(LedState *state);
 
 #endif // LED_LINE_OPS
