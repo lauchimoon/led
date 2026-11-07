@@ -34,15 +34,15 @@ void handle_editor_events(LedState *state)
     if (IsKeyPressed(KEY_TAB))
         append_tab(state);
 
+    if (key_pressed_or_repeat(KEY_ENTER))
+        new_line(state);
+
     if (state->cursor < 0)
         state->cursor = 0;
 
-    int c = GetCharPressed();
-    while (c > 0) {
-        if (c == KEY_ENTER)
-            new_line(state);
-        else if (c >= ' ' && c <= '~')
+    int c;
+    while ((c = GetCharPressed()) > 0) {
+        if (c >= ' ' && c <= '~')
             append_char_cursor(state, c, true);
-        c = GetCharPressed();
     }
 }
