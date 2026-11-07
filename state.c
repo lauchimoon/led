@@ -21,7 +21,6 @@ void state_init(LedState *state, const char *filename)
     state->line = -1;
     state->lines_capacity = 100;
     state->lines = calloc(state->lines_capacity, sizeof(Line));
-    state->line_scroll = 1;
 
     state->camera.offset = (Vector2){ 0.0f, 0.0f };
     state->camera.target = (Vector2){ 0.0f, 0.0f };

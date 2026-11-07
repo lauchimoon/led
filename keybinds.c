@@ -32,6 +32,24 @@ static void keep_cursor_visible_horizontally(LedState *state)
         state->camera.target.x = 0;
 }
 
+static void keep_cursor_visible_vertically(LedState *state)
+{
+    int line_height = state->font_size;
+
+    // Leave room for the HUD at the bottom of the screen.
+    int screen_height = GetScreenHeight() - line_height;
+    int cursor_top = state->line*line_height;        // top-side of screen cursor
+    int cursor_bottom = cursor_top + line_height;    // bottom-side of screen cursor
+
+    if (cursor_top < state->camera.target.y)
+        state->camera.target.y = cursor_top;
+    else if (cursor_bottom > state->camera.target.y + screen_height)
+        state->camera.target.y = cursor_bottom - screen_height;
+
+    if (state->camera.target.y < 0)
+        state->camera.target.y = 0;
+}
+
 void handle_cursor_movement(LedState *state)
 {
     int current_line_len = strlen(state->lines[state->line]);
@@ -45,12 +63,6 @@ void handle_cursor_movement(LedState *state)
             int line_above_len = strlen(state->lines[state->line - 1]);
             --state->line;
 
-            --state->line_scroll;
-            if (state->line_scroll <= 0) {
-                state->camera.target.y -= state->font_size;
-                state->line_scroll = 1;
-            }
-
             if (state->cursor > line_above_len)
                 state->cursor = line_above_len;
         } else
@@ -59,12 +71,6 @@ void handle_cursor_movement(LedState *state)
         if (state->lines[state->line + 1]) {
             int line_below_len = strlen(state->lines[state->line + 1]);
             ++state->line;
-            ++state->line_scroll;
-
-            if (state->line_scroll > get_number_lines_on_screen(state)) {
-                state->camera.target.y += state->font_size;
-                --state->line_scroll;
-            }
 
             if (state->cursor > line_below_len)
                 state->cursor = line_below_len;
@@ -74,7 +80,6 @@ void handle_cursor_movement(LedState *state)
 
     if (key_pressed_or_repeat(KEY_PAGE_DOWN)) {
         int lines_on_screen = get_number_lines_on_screen(state);
-        state->line_scroll = 1;
         state->line += lines_on_screen;
 
         if (state->line > state->lines_num)
@@ -86,7 +91,6 @@ void handle_cursor_movement(LedState *state)
 
     if (key_pressed_or_repeat(KEY_PAGE_UP)) {
         int lines_on_screen = get_number_lines_on_screen(state);
-        state->line_scroll = 1;
         state->line -= lines_on_screen;
 
         if (state->line < 0)
@@ -103,6 +107,7 @@ void handle_cursor_movement(LedState *state)
         move_to_end(state);
 
     keep_cursor_visible_horizontally(state);
+    keep_cursor_visible_vertically(state);
 }
 
 void move_to_start(LedState *state)

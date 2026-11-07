@@ -27,7 +27,6 @@ typedef struct LedState {
     int lines_num;
 
     int line;
-    int line_scroll;
     int cursor;
 
     Font font;
