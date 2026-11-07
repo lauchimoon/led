@@ -14,8 +14,6 @@
 
 #define LINE_SIZE       1024
 
-#define REPEAT_COOLDOWN 3
-
 #define FONT_SIZE_INIT     24
 #define FONT_RESIZE_FACTOR 4
 #define FONT_RESIZE_MIN    FONT_SIZE_INIT/2
@@ -58,7 +56,6 @@ typedef struct LedState {
     int line;
     int line_scroll;
     int cursor;
-    int repeat_cooldown;
 
     Font font;
     int font_size;
@@ -80,6 +77,7 @@ void load_file(LedState *);
 void state_deinit(LedState *);
 
 bool any_key_pressed(int *);
+bool key_pressed_or_repeat(int);
 
 void handle_editor_events(LedState *);
 void handle_cursor_movement(LedState *);
@@ -125,9 +123,6 @@ int main(int argc, char **argv)
     SetTargetFPS(FPS);
 
     while (!state.exit) {
-        ++state.repeat_cooldown;
-        state.repeat_cooldown %= REPEAT_COOLDOWN;
-
         handle_editor_events(&state);
 
         handle_cursor_movement(&state);
@@ -189,7 +184,6 @@ void state_init(LedState *state, const char *filename)
     state->filename = filename;
 
     state->cursor = 0;
-    state->repeat_cooldown = 0;
 
     state->font_size = FONT_SIZE_INIT;
     state->font = LoadFontFromMemory(".ttf", GeistMono_Regular_ttf, GeistMono_Regular_ttf_len, state->font_size, NULL, 95);
@@ -259,6 +253,11 @@ bool any_key_pressed(int *key)
     return *key >= ' ' && *key <= KEY_KB_MENU;
 }
 
+bool key_pressed_or_repeat(int key)
+{
+    return IsKeyPressed(key) || IsKeyPressedRepeat(key);
+}
+
 void handle_editor_events(LedState *state)
 {
     if (IsKeyDown(KEY_LEFT_CONTROL)) {
@@ -281,8 +280,7 @@ void handle_editor_events(LedState *state)
                 state->theme = themes[1];
     }
 
-    if (IsKeyDown(KEY_BACKSPACE) && state->cursor > 0 &&
-            state->repeat_cooldown % REPEAT_COOLDOWN == 0)
+    if (key_pressed_or_repeat(KEY_BACKSPACE) && state->cursor > 0)
         delete_char_cursor(state, true);
 
     if (IsKeyPressed(KEY_TAB))
@@ -305,11 +303,11 @@ void handle_cursor_movement(LedState *state)
 {
     int current_line_len = strlen(state->lines[state->line]);
 
-    if (IsKeyDown(KEY_LEFT) && state->repeat_cooldown % REPEAT_COOLDOWN == 0)
+    if (key_pressed_or_repeat(KEY_LEFT))
         state->cursor -= state->cursor > 0? 1 : 0;
-    else if (IsKeyDown(KEY_RIGHT) && state->repeat_cooldown % REPEAT_COOLDOWN == 0)
+    else if (key_pressed_or_repeat(KEY_RIGHT))
         state->cursor += state->cursor < current_line_len? 1 : 0;
-    else if (IsKeyDown(KEY_UP) && state->repeat_cooldown % REPEAT_COOLDOWN == 0) {
+    else if (key_pressed_or_repeat(KEY_UP)) {
         if (state->line > 0) {
             int line_above_len = strlen(state->lines[state->line - 1]);
             --state->line;
@@ -324,7 +322,7 @@ void handle_cursor_movement(LedState *state)
                 state->cursor = line_above_len;
         } else
             state->cursor = 0;
-    } else if (IsKeyDown(KEY_DOWN) && state->repeat_cooldown % REPEAT_COOLDOWN == 0) {
+    } else if (key_pressed_or_repeat(KEY_DOWN)) {
         if (state->lines[state->line + 1]) {
             int line_below_len = strlen(state->lines[state->line + 1]);
             ++state->line;
