@@ -38,8 +38,8 @@ typedef struct LedState {
     Line copy_buffer;
 } LedState;
 
-void state_init(LedState *state, const char *filename);
-void load_file(LedState *state);
+int state_init(LedState *state, const char *filename);
+int load_file(LedState *state);
 void write_file(LedState *state);
 void state_load_font(LedState *state);
 void state_deinit(LedState *state);

@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void state_init(LedState *state, const char *filename)
+int state_init(LedState *state, const char *filename)
 {
     state->filename = filename;
 
@@ -30,19 +30,27 @@ void state_init(LedState *state, const char *filename)
     state->copy_buffer = calloc(LINE_SIZE, sizeof(char));
 
     if (FileExists(state->filename)) {
-        load_file(state);
+        int res = load_file(state);
+        if (res != 0) {
+            printf("led: could not open '%s' for reading\n", state->filename);
+            return 1;
+        }
 
         if (state->lines_num == 0) new_line(state);
         else state->line = 0;
-        return;
+        return 0;
     }
 
     new_line(state);
+    return 0;
 }
 
-void load_file(LedState *state)
+int load_file(LedState *state)
 {
     FILE *f = fopen(state->filename, "r");
+    if (!f)
+        return 1;
+
     char buffer[LINE_SIZE] = { 0 };
 
     while (fgets(buffer, LINE_SIZE, f) != NULL) {
@@ -58,12 +66,18 @@ void load_file(LedState *state)
     }
 
     fclose(f);
+    return 0;
 }
 
 void write_file(LedState *state)
 {
     state->dirty = false;
     FILE *f = fopen(state->filename, "w");
+    if (!f) {
+        printf("led: could not open '%s' for writing\n", state->filename);
+        return;
+    }
+
     for (int i = 0; i < state->lines_num; ++i)
         fprintf(f, "%s\n", state->lines[i]);
 

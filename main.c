@@ -30,7 +30,9 @@ int main(int argc, char **argv)
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, state.title);
     SetWindowMinSize(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
 
-    state_init(&state, filename);
+    int res = state_init(&state, filename);
+    if (res != 0)
+        return 1;
 
     SetTargetFPS(FPS);
 
