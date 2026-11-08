@@ -16,26 +16,21 @@
 typedef char *Line;
 
 typedef struct LedState {
-    const char *title;
     const char *filename;
-    bool exit;
+    int cursor;
+    int font_size;
+    Font font;
     LedTheme theme;
-
-    Line *lines;
+    int line;
     int lines_capacity;
     int lines_num;
-
-    int line;
-    int cursor;
-
-    Font font;
-    int font_size;
+    Line *lines;
+    Camera2D camera;
+    Line copy_buffer;
 
     bool dirty;
-
-    Camera2D camera;
-
-    Line copy_buffer;
+    const char *title;
+    bool exit;
 } LedState;
 
 int state_init(LedState *state, const char *filename);

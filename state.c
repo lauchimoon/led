@@ -20,6 +20,7 @@ int state_init(LedState *state, const char *filename)
 
     state->line = -1;
     state->lines_capacity = 100;
+    state->lines_num = 0;
     state->lines = calloc(state->lines_capacity, sizeof(Line));
 
     state->camera.offset = (Vector2){ 0.0f, 0.0f };
@@ -28,6 +29,7 @@ int state_init(LedState *state, const char *filename)
     state->camera.zoom = 1.0f;
 
     state->copy_buffer = calloc(LINE_SIZE, sizeof(char));
+    state->dirty = false;
 
     if (FileExists(state->filename)) {
         int res = load_file(state);
