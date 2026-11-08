@@ -17,10 +17,12 @@ If `<file>` doesn't exist, `led` will create it.
 ## Keybinds
 - Arrow keys: Movement
 - Page Up, Page Down: Scroll
-- Ctrl + Q: Exit editor
+- Enter: new line
+- Ctrl + C: Copy line
 - Ctrl + D: Delete current line
+- Ctrl + J: Decrease font size
+- Ctrl + K: Increase font size
+- Ctrl + Q: Exit editor
 - Ctrl + S: Save buffer
-- Ctrl + Z: Undo (limited for now)
-- Ctrl + K: Increment font size
-- Ctrl + J: Decrement font size
 - Ctrl + T + <1, 2>: Change theme (1 is dark, 2 is white)
+- Ctrl + V: Paste line
