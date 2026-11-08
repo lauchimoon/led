@@ -22,6 +22,7 @@ void new_line(LedState *state)
 
     state->lines[state->line] = new;
     state->cursor = 0;
+    state->dirty = true;
 }
 
 void delete_char_cursor(LedState *state, bool undo)
