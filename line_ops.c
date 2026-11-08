@@ -9,7 +9,7 @@ void new_line(LedState *state)
     Line new = calloc(LINE_SIZE, sizeof(char));
     ++state->lines_num;
 
-    for (int i = state->lines_num; i > state->line; --i)
+    for (int i = state->lines_num; i > state->line + 1; --i)
         state->lines[i] = state->lines[i - 1];
 
     ++state->line;

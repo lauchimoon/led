@@ -31,7 +31,9 @@ void state_init(LedState *state, const char *filename)
 
     if (FileExists(state->filename)) {
         load_file(state);
-        state->line = 0;
+
+        if (state->lines_num == 0) new_line(state);
+        else state->line = 0;
         return;
     }
 
