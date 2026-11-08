@@ -27,7 +27,6 @@ void state_init(LedState *state, const char *filename)
     state->camera.rotation = 0.0f;
     state->camera.zoom = 1.0f;
 
-    state->undo = undo_init();
     state->copy_buffer = calloc(LINE_SIZE, sizeof(char));
 
     if (FileExists(state->filename)) {
@@ -91,6 +90,5 @@ void state_deinit(LedState *state)
     state->line = 0;
     state->cursor = 0;
 
-    undo_free(state->undo);
     free(state->copy_buffer);
 }

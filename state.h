@@ -5,7 +5,6 @@
 
 #include "raylib.h"
 #include "theme.h"
-#include "undo.h"
 
 #define LINE_SIZE       1024
 
@@ -36,7 +35,6 @@ typedef struct LedState {
 
     Camera2D camera;
 
-    UndoBuffer *undo;
     Line copy_buffer;
 } LedState;
 

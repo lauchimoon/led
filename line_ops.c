@@ -1,7 +1,5 @@
 #include "line_ops.h"
 
-#include "undo.h"
-
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -25,22 +23,12 @@ void new_line(LedState *state)
     state->dirty = true;
 }
 
-void delete_char_cursor(LedState *state, bool undo)
+void delete_char_cursor(LedState *state)
 {
     Line line = state->lines[state->line];
     int line_len = strlen(line);
     if (line_len < 1)
         return;
-
-    if (undo) {
-        UndoAction action = {
-            .type = UNDO_ACTION_DELETE_CHAR,
-            .line = state->line,
-            .cursor = state->cursor,
-            .ch = line[state->cursor - 1],
-        };
-        state->undo = undo_append(state->undo, action);
-    }
 
     for (int i = state->cursor - 1; i < line_len; ++i)
         line[i] = line[i + 1];
@@ -49,20 +37,10 @@ void delete_char_cursor(LedState *state, bool undo)
     state->dirty = true;
 }
 
-void append_char_cursor(LedState *state, int c, bool undo)
+void append_char_cursor(LedState *state, int c)
 {
     Line line = state->lines[state->line];
     int line_len = strlen(line);
-
-    if (undo) {
-        UndoAction action = {
-            .type = UNDO_ACTION_APPEND_CHAR,
-            .line = state->line,
-            .cursor = state->cursor,
-            .ch = c,
-        };
-        state->undo = undo_append(state->undo, action);
-    }
 
     for (int i = line_len; i > state->cursor; --i)
         line[i] = line[i - 1];
@@ -92,7 +70,7 @@ void delete_line(LedState *state)
 void append_tab(LedState *state)
 {
     for (int i = 0; i < 4; ++i)
-        append_char_cursor(state, ' ', true);
+        append_char_cursor(state, ' ');
 
     state->dirty = true;
 }

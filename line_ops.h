@@ -4,8 +4,8 @@
 #include "state.h"
 
 void new_line(LedState *state);
-void delete_char_cursor(LedState *state, bool undo);
-void append_char_cursor(LedState *state, int c, bool undo);
+void delete_char_cursor(LedState *state);
+void append_char_cursor(LedState *state, int c);
 void delete_line(LedState *state);
 void append_tab(LedState *state);
 void copy_line(LedState *state);

@@ -2,7 +2,6 @@
 
 #include "keybinds.h"
 #include "line_ops.h"
-#include "undo.h"
 #include "utils.h"
 
 void handle_editor_events(LedState *state)
@@ -14,8 +13,6 @@ void handle_editor_events(LedState *state)
             delete_line(state);
         else if (IsKeyPressed(KEY_S))
             write_file(state);
-        else if (IsKeyPressed(KEY_Z))
-            undo(state);
         else if (IsKeyPressed(KEY_K))
             resize_font(state, RESIZE_ACTION_INCREASE);
         else if (IsKeyPressed(KEY_J))
@@ -32,7 +29,7 @@ void handle_editor_events(LedState *state)
     }
 
     if (key_pressed_or_repeat(KEY_BACKSPACE) && state->cursor > 0)
-        delete_char_cursor(state, true);
+        delete_char_cursor(state);
 
     if (IsKeyPressed(KEY_TAB))
         append_tab(state);
@@ -46,6 +43,6 @@ void handle_editor_events(LedState *state)
     int c;
     while ((c = GetCharPressed()) > 0) {
         if (c >= ' ' && c <= '~')
-            append_char_cursor(state, c, true);
+            append_char_cursor(state, c);
     }
 }
