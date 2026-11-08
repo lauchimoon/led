@@ -63,7 +63,7 @@ void handle_cursor_movement(LedState *state)
             int line_above_len = strlen(state->lines[state->line - 1]);
             --state->line;
 
-            if (state->cursor > line_above_len)
+            if (state->cursor >= line_above_len)
                 state->cursor = line_above_len;
         } else
             state->cursor = 0;
@@ -82,7 +82,7 @@ void handle_cursor_movement(LedState *state)
         int lines_on_screen = get_number_lines_on_screen(state);
         state->line += lines_on_screen;
 
-        if (state->line > state->lines_num)
+        if (state->line >= state->lines_num)
             state->line = state->lines_num - 1;
 
         state->cursor = strlen(state->lines[state->line]);
