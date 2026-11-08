@@ -61,6 +61,9 @@ void append_char_cursor(LedState *state, int c)
 void delete_line(LedState *state)
 {
     Line line = state->lines[state->line];
+    if (!line)
+        return;
+
     if (state->lines_num == 1) {
         memset(line, 0, strlen(line));
     } else {
@@ -87,6 +90,9 @@ void append_tab(LedState *state)
 void copy_line(LedState *state)
 {
     memset(state->copy_buffer, 0, LINE_SIZE);
+    if (!state->lines[state->line])
+        return;
+
     int n = strlen(state->lines[state->line]);
     if (n > LINE_SIZE - 1)
         n = LINE_SIZE - 1;
@@ -95,6 +101,9 @@ void copy_line(LedState *state)
 
 void paste_line(LedState *state)
 {
+    if (!state->copy_buffer)
+        return;
+
     new_line(state);
     int n = strlen(state->copy_buffer);
     if (n > LINE_SIZE - 1)

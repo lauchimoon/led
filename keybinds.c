@@ -83,7 +83,7 @@ void handle_cursor_movement(LedState *state)
         state->line += lines_on_screen;
 
         if (state->line >= state->lines_num)
-            state->line = state->lines_num - 1;
+            state->line = (state->lines_num > 0)? state->lines_num - 1 : 0;
 
         state->cursor = strlen(state->lines[state->line]);
         state->camera.target.y = state->font_size*state->line;
