@@ -30,6 +30,9 @@ void delete_char_cursor(LedState *state)
     if (line_len < 1)
         return;
 
+    if (state->cursor <= 0)
+        return;
+
     for (int i = state->cursor - 1; i < line_len; ++i)
         line[i] = line[i + 1];
 
@@ -41,6 +44,12 @@ void append_char_cursor(LedState *state, int c)
 {
     Line line = state->lines[state->line];
     int line_len = strlen(line);
+
+    if (line_len >= LINE_SIZE - 1)
+        return;
+
+    if (state->cursor < 0 || state->cursor > line_len)
+        return;
 
     for (int i = line_len; i > state->cursor; --i)
         line[i] = line[i - 1];
@@ -79,6 +88,8 @@ void copy_line(LedState *state)
 {
     memset(state->copy_buffer, 0, LINE_SIZE);
     int n = strlen(state->lines[state->line]);
+    if (n > LINE_SIZE - 1)
+        n = LINE_SIZE - 1;
     strncpy(state->copy_buffer, state->lines[state->line], n);
 }
 
@@ -86,5 +97,7 @@ void paste_line(LedState *state)
 {
     new_line(state);
     int n = strlen(state->copy_buffer);
+    if (n > LINE_SIZE - 1)
+        n = LINE_SIZE - 1;
     strncpy(state->lines[state->line], state->copy_buffer, n);
 }

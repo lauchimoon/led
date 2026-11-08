@@ -56,7 +56,9 @@ int load_file(LedState *state)
     while (fgets(buffer, LINE_SIZE, f) != NULL) {
         state->lines[state->lines_num] = calloc(LINE_SIZE, sizeof(char));
         int line_len = strlen(buffer);
-        strncpy(state->lines[state->lines_num], buffer, line_len - 1);
+        if (line_len > 0 && buffer[line_len - 1] == '\n')
+            --line_len;
+        memcpy(state->lines[state->lines_num], buffer, line_len);
 
         ++state->lines_num;
         if (state->lines_num >= state->lines_capacity/2) {

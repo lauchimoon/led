@@ -7,7 +7,8 @@ void draw_text(LedState *state, const char *text, int x, int y, Color color)
 
 void draw_cursor(LedState *state)
 {
-    char ch = state->lines[state->line][state->cursor - 1];
+    int cursor_idx = (state->cursor > 0)? state->cursor - 1 : 0;
+    char ch = state->lines[state->line][cursor_idx];
     GlyphInfo glyph = GetGlyphInfo(state->font, ch);
 
     Rectangle cursor_rec = { state->cursor*(glyph.advanceX + 1), state->line*state->font_size, glyph.advanceX, state->font_size };
