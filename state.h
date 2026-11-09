@@ -13,6 +13,11 @@
 #define FONT_RESIZE_MIN    FONT_SIZE_INIT/2
 #define FONT_RESIZE_MAX    FONT_SIZE_INIT*2
 
+#define FILEPERM_RW 0
+#define FILEPERM_RO 1
+#define FILEPERM_WO 2
+#define FILEPERM_NO 3
+
 typedef char *Line;
 
 typedef struct LedState {
@@ -28,6 +33,7 @@ typedef struct LedState {
     Camera2D camera;
     Line copy_buffer;
 
+    int fileperm;
     bool dirty;
     const char *title;
     bool exit;

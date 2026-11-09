@@ -6,6 +6,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+
+static int get_file_permissions(const char *filename)
+{
+    bool is_write = (access(filename, W_OK) == 0);
+    bool is_read = (access(filename, R_OK) == 0);
+
+    if (is_write && is_read)
+        return FILEPERM_RW;
+    else if (!is_write && is_read)
+        return FILEPERM_RO;
+    else if (is_write && !is_read)
+        return FILEPERM_WO;
+    else
+        return FILEPERM_NO;
+}
 
 int state_init(LedState *state, const char *filename)
 {
@@ -32,6 +48,7 @@ int state_init(LedState *state, const char *filename)
     state->dirty = false;
 
     if (FileExists(state->filename)) {
+        state->fileperm = get_file_permissions(state->filename);
         int res = load_file(state);
         if (res != 0) {
             printf("led: could not open '%s' for reading\n", state->filename);
