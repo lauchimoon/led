@@ -127,3 +127,13 @@ void paste_line(LedState *state)
         n = LINE_SIZE - 1;
     strncpy(state->lines[state->line], state->copy_buffer, n);
 }
+
+void move_line_above(LedState *state)
+{
+    Line line = state->lines[state->line];
+    Line prev = state->lines[state->line - 1];
+    int new_curs = strlen(prev);
+    strcat(state->lines[state->line - 1], line);
+    delete_line(state);
+    state->cursor = new_curs;
+}

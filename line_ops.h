@@ -11,5 +11,6 @@ void delete_line(LedState *state);
 void append_tab(LedState *state);
 void copy_line(LedState *state);
 void paste_line(LedState *state);
+void move_line_above(LedState *state);
 
 #endif // LED_LINE_OPS

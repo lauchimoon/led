@@ -4,6 +4,9 @@
 #include "line_ops.h"
 #include "utils.h"
 
+#include <string.h>
+#include <stdio.h>
+
 void handle_editor_events(LedState *state)
 {
     if (IsKeyDown(KEY_LEFT_CONTROL)) {
@@ -28,9 +31,14 @@ void handle_editor_events(LedState *state)
             paste_line(state);
     }
 
-    if (state->fileperm == FILEPERM_RW && key_pressed_or_repeat(KEY_BACKSPACE)
-            && state->cursor > 0)
-        delete_char_cursor(state);
+    if (state->fileperm == FILEPERM_RW && key_pressed_or_repeat(KEY_BACKSPACE)) {
+        int curs = state->cursor;
+        if (curs > 0)
+            delete_char_cursor(state);
+        else
+            if (state->line > 0)
+                move_line_above(state);
+    }
 
     if (state->fileperm == FILEPERM_RW && IsKeyPressed(KEY_TAB))
         append_tab(state);
