@@ -18,6 +18,8 @@
 #define FILEPERM_WO 2
 #define FILEPERM_NO 3
 
+#define NOTIFICATION_MAX_LEN 128
+
 typedef char *Line;
 
 typedef struct LedState {
@@ -37,6 +39,9 @@ typedef struct LedState {
     bool dirty;
     const char *title;
     bool exit;
+
+    char notification[NOTIFICATION_MAX_LEN];
+    double notification_end_time;
 } LedState;
 
 int state_init(LedState *state, const char *filename);

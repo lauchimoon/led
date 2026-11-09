@@ -1,4 +1,5 @@
 #include "state.h"
+#include "notification.h"
 
 #include "fonts/GeistMono-Regular.h"
 #include "line_ops.h"
@@ -95,7 +96,6 @@ void write_file(LedState *state)
     state->dirty = false;
     FILE *f = fopen(state->filename, "w");
     if (!f) {
-        printf("led: could not open '%s' for writing\n", state->filename);
         return;
     }
 
@@ -103,6 +103,7 @@ void write_file(LedState *state)
         fprintf(f, "%s\n", state->lines[i]);
 
     fclose(f);
+    notify(state, "saved file");
 }
 
 void state_load_font(LedState *state)

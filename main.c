@@ -4,6 +4,7 @@
 #include "events.h"
 #include "keybinds.h"
 #include "state.h"
+#include "notification.h"
 
 #include <stdio.h>
 
@@ -51,6 +52,7 @@ int main(int argc, char **argv)
         EndMode2D();
 
         draw_hud(&state);
+        draw_notification(&state);
         EndDrawing();
     }
 
