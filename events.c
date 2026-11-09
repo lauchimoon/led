@@ -36,7 +36,7 @@ void handle_editor_events(LedState *state)
         append_tab(state);
 
     if (state->fileperm == FILEPERM_RW && key_pressed_or_repeat(KEY_ENTER))
-        new_line(state);
+        split_line(state);
 
     if (state->cursor < 0)
         state->cursor = 0;

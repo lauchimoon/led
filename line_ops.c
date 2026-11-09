@@ -23,6 +23,23 @@ void new_line(LedState *state)
     state->dirty = true;
 }
 
+void split_line(LedState *state)
+{
+    Line line = state->lines[state->line];
+    int line_len = strlen(line);
+
+    if (state->cursor < 0)
+        state->cursor = 0;
+    if (state->cursor > line_len)
+        state->cursor = line_len;
+
+    int cur = state->cursor;
+    new_line(state);
+    Line new = state->lines[state->line];
+    strcpy(new, line + cur);
+    line[cur] = '\0';
+}
+
 void delete_char_cursor(LedState *state)
 {
     Line line = state->lines[state->line];
