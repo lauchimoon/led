@@ -31,7 +31,7 @@ void handle_editor_events(LedState *state)
             paste_line(state);
         else if (IsKeyPressed(KEY_N))
             state->number = !state->number;
-        else if (IsKeyPressed(KEY_G) && state->lines_num > 0) {
+        else if (IsKeyPressed(KEY_PAGE_UP) && state->lines_num > 0) {
             state->line = 0;
             state->cursor = 0;
         }
