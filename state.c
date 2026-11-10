@@ -96,6 +96,7 @@ void write_file(LedState *state)
     state->dirty = false;
     FILE *f = fopen(state->filename, "w");
     if (!f) {
+        notify(state, "could not save; file is read-only");
         return;
     }
 

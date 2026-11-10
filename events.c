@@ -14,7 +14,7 @@ void handle_editor_events(LedState *state)
             state->exit = true;
         else if (state->fileperm == FILEPERM_RW && IsKeyPressed(KEY_D))
             delete_line(state);
-        else if (state->fileperm == FILEPERM_RW && IsKeyPressed(KEY_S))
+        else if (IsKeyPressed(KEY_S))
             write_file(state);
         else if (IsKeyPressed(KEY_K))
             resize_font(state, RESIZE_ACTION_INCREASE);
