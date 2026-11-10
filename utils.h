@@ -8,5 +8,6 @@
 int get_char_width(LedState *state);
 int get_number_column_width(LedState *state);
 bool key_pressed_or_repeat(int key);
+bool isint(const char *s, long long *result);
 
 #endif // LED_UTILS

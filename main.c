@@ -53,6 +53,7 @@ int main(int argc, char **argv)
 
         draw_line_numbers(&state);
         draw_hud(&state);
+        draw_goto_line_prompt(&state);
         draw_notification(&state);
         EndDrawing();
     }

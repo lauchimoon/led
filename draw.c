@@ -57,3 +57,27 @@ void draw_hud(LedState *state)
     const char *text = TextFormat("%s%s", info, (state->fileperm != FILEPERM_RW)? " | Read-only" : "");
     draw_text(state, text, 0, GetScreenHeight() - state->font_size, state->theme.text_color);
 }
+
+void draw_goto_line_prompt(LedState *state)
+{
+    if (!state->goto_line_active)
+        return;
+
+    const char *prompt = TextFormat("go to line: %s", state->goto_line_input);
+    Vector2 text_size = MeasureTextEx(state->font, prompt, state->font_size, 1.0f);
+
+    float pad = 8.0f;
+    float margin = 12.0f;
+    Rectangle prompt_box = {
+        margin,
+        GetScreenHeight() - text_size.y - 2*pad - margin,
+        text_size.x + 2*pad,
+        text_size.y + 2*pad
+    };
+
+    DrawRectangleRec(prompt_box, state->theme.hud_color);
+    DrawRectangleLinesEx(prompt_box, 1.0f, state->theme.text_color);
+    DrawTextEx(state->font, prompt,
+               (Vector2){ prompt_box.x + pad, prompt_box.y + pad },
+               state->font_size, 1.0f, state->theme.text_color);
+}

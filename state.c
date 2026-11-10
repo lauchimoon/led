@@ -49,6 +49,9 @@ int state_init(LedState *state, const char *filename)
     state->dirty = false;
     state->number = false;
 
+    state->goto_line_active = false;
+    state->goto_line_input[0] = '\0';
+
     if (FileExists(state->filename)) {
         state->fileperm = get_file_permissions(state->filename);
         int res = load_file(state);

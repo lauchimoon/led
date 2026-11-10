@@ -19,6 +19,7 @@
 #define FILEPERM_NO 3
 
 #define NOTIFICATION_MAX_LEN 128
+#define GOTO_LINE_MAX_LEN    20
 
 typedef char *Line;
 
@@ -28,9 +29,9 @@ typedef struct LedState {
     int font_size;
     Font font;
     LedTheme theme;
-    int line;
+    long long line;
     int lines_capacity;
-    int lines_num;
+    long long lines_num;
     Line *lines;
     Camera2D camera;
     Line copy_buffer;
@@ -43,6 +44,9 @@ typedef struct LedState {
 
     char notification[NOTIFICATION_MAX_LEN];
     double notification_end_time;
+
+    bool goto_line_active;
+    char goto_line_input[GOTO_LINE_MAX_LEN + 1];
 } LedState;
 
 int state_init(LedState *state, const char *filename);

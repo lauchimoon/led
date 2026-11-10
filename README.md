@@ -22,6 +22,7 @@ If `<file>` doesn't exist, `led` will create it.
 - Ctrl + PageDown: Go to the bottom of the file
 - Ctrl + C: Copy line
 - Ctrl + D: Delete current line
+- Ctrl + G: Open line-jumping prompt
 - Ctrl + J: Decrease font size
 - Ctrl + K: Increase font size
 - Ctrl + N: Toggle line numbers

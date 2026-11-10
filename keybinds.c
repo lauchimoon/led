@@ -51,6 +51,9 @@ static void keep_cursor_visible_vertically(LedState *state)
 
 void handle_cursor_movement(LedState *state)
 {
+    if (state->goto_line_active)
+        return;
+
     state->camera.offset.x = get_number_column_width(state);
 
     int current_line_len = strlen(state->lines[state->line]);
