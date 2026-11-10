@@ -1,4 +1,5 @@
 #include "line_ops.h"
+#include "notification.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -114,6 +115,7 @@ void copy_line(LedState *state)
     if (n > LINE_SIZE - 1)
         n = LINE_SIZE - 1;
     strncpy(state->copy_buffer, state->lines[state->line], n);
+    notify(state, "copied line");
 }
 
 void paste_line(LedState *state)
@@ -126,6 +128,7 @@ void paste_line(LedState *state)
     if (n > LINE_SIZE - 1)
         n = LINE_SIZE - 1;
     strncpy(state->lines[state->line], state->copy_buffer, n);
+    notify(state, "pasted line");
 }
 
 void move_line_above(LedState *state)
