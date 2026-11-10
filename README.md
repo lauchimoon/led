@@ -17,7 +17,9 @@ If `<file>` doesn't exist, `led` will create it.
 ## Keybinds
 - Arrow keys: Movement
 - Page Up, Page Down: Scroll
-- Enter: new line
+- Enter: New line
+- Ctrl + PageUp: Go to the top of the file
+- Ctrl + PageDown: Go to the bottom of the file
 - Ctrl + C: Copy line
 - Ctrl + D: Delete current line
 - Ctrl + J: Decrease font size
