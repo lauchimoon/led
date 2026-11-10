@@ -10,23 +10,22 @@ static int get_number_lines_on_screen(LedState *state)
     return num_lines - 1;
 }
 
-static int get_char_width(LedState *state)
-{
-    // Using 'M' as a guide; we only care advanceX field.
-    return GetGlyphInfo(state->font, 'M').advanceX + 1;
-}
-
 static void keep_cursor_visible_horizontally(LedState *state)
 {
     int char_width = get_char_width(state);
+    int number_column_width = get_number_column_width(state);
     int screen_width = GetScreenWidth();
+    int visible_width = screen_width - number_column_width;
     int cursor_left = state->cursor*char_width;  // left-side of screen cursor
     int cursor_right = cursor_left + char_width; // right-side of screen cursor
 
+    if (visible_width < char_width)
+        visible_width = char_width;
+
     if (cursor_left < state->camera.target.x)
         state->camera.target.x = cursor_left;
-    else if (cursor_right > state->camera.target.x + screen_width)
-        state->camera.target.x = cursor_right - screen_width;
+    else if (cursor_right > state->camera.target.x + visible_width)
+        state->camera.target.x = cursor_right - visible_width;
 
     if (state->camera.target.x < 0)
         state->camera.target.x = 0;
@@ -52,6 +51,8 @@ static void keep_cursor_visible_vertically(LedState *state)
 
 void handle_cursor_movement(LedState *state)
 {
+    state->camera.offset.x = get_number_column_width(state);
+
     int current_line_len = strlen(state->lines[state->line]);
 
     if (key_pressed_or_repeat(KEY_LEFT))

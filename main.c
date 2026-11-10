@@ -51,6 +51,7 @@ int main(int argc, char **argv)
             draw_cursor(&state);
         EndMode2D();
 
+        draw_line_numbers(&state);
         draw_hud(&state);
         draw_notification(&state);
         EndDrawing();

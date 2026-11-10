@@ -29,6 +29,8 @@ void handle_editor_events(LedState *state)
             copy_line(state);
         else if (state->fileperm == FILEPERM_RW && IsKeyPressed(KEY_V))
             paste_line(state);
+        else if (IsKeyPressed(KEY_N))
+            state->number = !state->number;
     }
 
     if (state->fileperm == FILEPERM_RW && key_pressed_or_repeat(KEY_BACKSPACE)) {

@@ -39,6 +39,7 @@ typedef struct LedState {
     bool dirty;
     const char *title;
     bool exit;
+    bool number;
 
     char notification[NOTIFICATION_MAX_LEN];
     double notification_end_time;

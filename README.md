@@ -22,6 +22,7 @@ If `<file>` doesn't exist, `led` will create it.
 - Ctrl + D: Delete current line
 - Ctrl + J: Decrease font size
 - Ctrl + K: Increase font size
+- Ctrl + N: Toggle line numbers
 - Ctrl + Q: Exit editor
 - Ctrl + S: Save buffer
 - Ctrl + T + <1, 2>: Change theme (1 is dark, 2 is white)

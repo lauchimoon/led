@@ -47,6 +47,7 @@ int state_init(LedState *state, const char *filename)
 
     state->copy_buffer = calloc(LINE_SIZE, sizeof(char));
     state->dirty = false;
+    state->number = false;
 
     if (FileExists(state->filename)) {
         state->fileperm = get_file_permissions(state->filename);
