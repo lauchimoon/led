@@ -79,7 +79,7 @@ void handle_cursor_movement(LedState *state)
             state->cursor = strlen(state->lines[state->line]);
     }
 
-    if (key_pressed_or_repeat(KEY_PAGE_DOWN)) {
+    if (!IsKeyDown(KEY_LEFT_CONTROL) && key_pressed_or_repeat(KEY_PAGE_DOWN)) {
         int lines_on_screen = get_number_lines_on_screen(state);
         state->line += lines_on_screen;
 
@@ -90,7 +90,7 @@ void handle_cursor_movement(LedState *state)
         state->camera.target.y = state->font_size*state->line;
     }
 
-    if (key_pressed_or_repeat(KEY_PAGE_UP)) {
+    if (!IsKeyDown(KEY_LEFT_CONTROL) && key_pressed_or_repeat(KEY_PAGE_UP)) {
         int lines_on_screen = get_number_lines_on_screen(state);
         state->line -= lines_on_screen;
 

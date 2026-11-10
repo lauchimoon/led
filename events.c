@@ -34,6 +34,9 @@ void handle_editor_events(LedState *state)
         else if (IsKeyPressed(KEY_PAGE_UP) && state->lines_num > 0) {
             state->line = 0;
             state->cursor = 0;
+        } else if (IsKeyPressed(KEY_PAGE_DOWN) && state->lines_num > 0) {
+            state->line = state->lines_num - 1;
+            state->cursor = strlen(state->lines[state->line]);
         }
     }
 
