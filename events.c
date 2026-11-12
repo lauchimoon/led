@@ -23,7 +23,7 @@ static void handle_goto_line_prompt(LedState *state)
             return;
         }
 
-        if (line < 0)
+        if (line <= 0)
             state->line = 0;
         else if (line >= state->lines_num)
             state->line = state->lines_num - 1;
