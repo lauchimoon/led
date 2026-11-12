@@ -30,6 +30,8 @@ static void handle_goto_line_prompt(LedState *state)
         else
             state->line = line - 1;
 
+        // TODO: should preserve cursor position
+        state->cursor = 0;
         return;
     }
 
