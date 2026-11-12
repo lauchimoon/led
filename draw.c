@@ -51,7 +51,9 @@ void draw_line_numbers(LedState *state)
 void draw_hud(LedState *state)
 {
     DrawRectangle(0, GetScreenHeight() - state->font_size, GetScreenWidth(), state->font_size, state->theme.hud_color);
-    const char *line_information = TextFormat("%d:%d", state->line + 1, state->cursor + 1);
+    const char *line_information = TextFormat("%lld:%lld",
+                                              state->line + 1,
+                                              state->cursor + 1);
     const char *info = TextFormat((state->dirty? "%s [*] | %s" : "%s | %s"),
                                   state->filename, line_information);
     const char *text = TextFormat("%s%s", info, (state->fileperm != FILEPERM_RW)? " | Read-only" : "");
