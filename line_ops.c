@@ -133,10 +133,25 @@ void paste_line(LedState *state)
 
 void move_line_above(LedState *state)
 {
+    if (state->line <= 0 || state->line >= state->lines_num)
+        return;
+
     Line line = state->lines[state->line];
     Line prev = state->lines[state->line - 1];
-    int new_curs = strlen(prev);
-    strcat(state->lines[state->line - 1], line);
+    if (!line || !prev)
+        return;
+
+    int prev_len = strlen(prev);
+    int line_len = strlen(line);
+
+    // Only join lines if the concatenation fits in a single line
+    if (prev_len + line_len >= LINE_SIZE) {
+        notify(state, "cannot join lines: line would be too long");
+        return;
+    }
+
+    int new_curs = prev_len;
+    memcpy(prev + prev_len, line, line_len + 1);
     delete_line(state);
     state->cursor = new_curs;
 }
