@@ -20,6 +20,7 @@ void new_line(LedState *state)
     }
 
     state->lines[state->line] = new;
+    state->lines[state->lines_num] = NULL;
     state->cursor = 0;
     state->dirty = true;
 }
@@ -96,6 +97,7 @@ void delete_line(LedState *state)
         state->line -= state->line > 0? 1 : 0;
     }
 
+    state->lines[state->lines_num] = NULL;
     state->cursor = 0;
     state->dirty = true;
 }

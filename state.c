@@ -89,6 +89,8 @@ int load_file(LedState *state)
             state->lines_capacity *= 2;
             state->lines = realloc(state->lines, state->lines_capacity*sizeof(Line));
         }
+
+        state->lines[state->lines_num] = NULL;
     }
 
     fclose(f);
