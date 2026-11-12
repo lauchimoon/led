@@ -3,7 +3,7 @@
 
 #include "state.h"
 
-void new_line(LedState *state);
+bool new_line(LedState *state);
 void split_line(LedState *state);
 void delete_char_cursor(LedState *state);
 void append_char_cursor(LedState *state, int c);

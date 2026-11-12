@@ -5,24 +5,35 @@
 #include <string.h>
 #include <stdio.h>
 
-void new_line(LedState *state)
+bool new_line(LedState *state)
 {
-    Line new = calloc(LINE_SIZE, sizeof(char));
-    ++state->lines_num;
+    if (state->line < -1 || state->line >= state->lines_num)
+        return false;
 
-    for (int i = state->lines_num; i > state->line + 1; --i)
-        state->lines[i] = state->lines[i - 1];
-
-    ++state->line;
-    if (state->lines_num >= state->lines_capacity/2) {
-        state->lines_capacity *= 2;
-        state->lines = realloc(state->lines, state->lines_capacity*sizeof(Line));
+    // Reserve room for the new line
+    if (!state_reserve_lines(state, state->lines_num + 2)) {
+        notify(state, "could not add line: out of memory");
+        return false;
     }
 
-    state->lines[state->line] = new;
+    Line new = calloc(LINE_SIZE, sizeof(char));
+    if (!new) {
+        notify(state, "could not add line: out of memory");
+        return false;
+    }
+
+    long long insert_at = state->line + 1;
+    for (long long i = state->lines_num; i > insert_at; --i)
+        state->lines[i] = state->lines[i - 1];
+
+    state->lines[insert_at] = new;
+    ++state->lines_num;
+    state->line = insert_at;
     state->lines[state->lines_num] = NULL;
+
     state->cursor = 0;
     state->dirty = true;
+    return true;
 }
 
 void split_line(LedState *state)
@@ -36,7 +47,8 @@ void split_line(LedState *state)
         state->cursor = line_len;
 
     int cur = state->cursor;
-    new_line(state);
+    if (!new_line(state))
+        return;
     Line new = state->lines[state->line];
     strcpy(new, line + cur);
     line[cur] = '\0';
@@ -128,7 +140,9 @@ void paste_line(LedState *state)
     if (!state->copy_buffer)
         return;
 
-    new_line(state);
+    if (!new_line(state))
+        return;
+
     int n = strlen(state->copy_buffer);
     if (n > LINE_SIZE - 1)
         n = LINE_SIZE - 1;

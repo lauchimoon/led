@@ -50,6 +50,7 @@ typedef struct LedState {
 } LedState;
 
 int state_init(LedState *state, const char *filename);
+bool state_reserve_lines(LedState *state, long long required);
 int load_file(LedState *state);
 void write_file(LedState *state);
 void state_load_font(LedState *state);

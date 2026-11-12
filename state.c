@@ -4,6 +4,8 @@
 #include "fonts/GeistMono-Regular.h"
 #include "line_ops.h"
 
+#include <limits.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -60,14 +62,69 @@ int state_init(LedState *state, const char *filename)
             return 1;
         }
 
-        if (state->lines_num == 0) new_line(state);
-        else state->line = 0;
+        if (state->lines_num == 0) {
+            if (!new_line(state)) {
+                printf("led: could not allocate memory\n");
+                return 1;
+            }
+        } else
+            state->line = 0;
         return 0;
     }
 
     state->fileperm = FILEPERM_RW;
-    new_line(state);
+    if (!new_line(state)) {
+        printf("led: could not allocate memory\n");
+        return 1;
+    }
     return 0;
+}
+
+bool state_reserve_lines(LedState *state, long long required)
+{
+    if (required < 0 || required > INT_MAX)
+        return false;
+
+    int old_capacity = state->lines_capacity;
+    if (old_capacity < 0 || !state->lines)
+        old_capacity = 0;
+
+    if (required <= old_capacity)
+        return true;
+
+    if ((size_t)required > SIZE_MAX / sizeof(Line))
+        return false;
+
+    long long new_capacity = old_capacity > 0 ? old_capacity : 1;
+    while (new_capacity < required) {
+        if (new_capacity > INT_MAX / 2) {
+            new_capacity = required;
+            break;
+        }
+        new_capacity *= 2;
+    }
+
+    // Keep the original pointer until realloc succeeds.
+    Line *new_lines = realloc(state->lines, (size_t)new_capacity * sizeof(Line));
+    if (!new_lines)
+        return false;
+
+    // Initialize because realloc doesn't do so.
+    memset(new_lines + old_capacity, 0,
+           (size_t)(new_capacity - old_capacity) * sizeof(Line));
+
+    state->lines = new_lines;
+    state->lines_capacity = (int)new_capacity;
+    return true;
+}
+
+static void discard_lines(LedState *state, long long first_line)
+{
+    while (state->lines_num > first_line) {
+        --state->lines_num;
+        free(state->lines[state->lines_num]);
+        state->lines[state->lines_num] = NULL;
+    }
 }
 
 int load_file(LedState *state)
@@ -76,21 +133,31 @@ int load_file(LedState *state)
     if (!f)
         return 1;
 
+    long long first_line = state->lines_num;
     char buffer[LINE_SIZE] = { 0 };
 
     while (fgets(buffer, LINE_SIZE, f) != NULL) {
-        state->lines[state->lines_num] = calloc(LINE_SIZE, sizeof(char));
+        // Reserve room for the new line and NULL
+        if (!state_reserve_lines(state, state->lines_num + 2)) {
+            discard_lines(state, first_line);
+            fclose(f);
+            return 1;
+        }
+
+        Line line = calloc(LINE_SIZE, sizeof(char));
+        if (!line) {
+            discard_lines(state, first_line);
+            fclose(f);
+            return 1;
+        }
+
         int line_len = strlen(buffer);
         if (line_len > 0 && buffer[line_len - 1] == '\n')
             --line_len;
-        memcpy(state->lines[state->lines_num], buffer, line_len);
+        memcpy(line, buffer, line_len);
 
+        state->lines[state->lines_num] = line;
         ++state->lines_num;
-        if (state->lines_num >= state->lines_capacity/2) {
-            state->lines_capacity *= 2;
-            state->lines = realloc(state->lines, state->lines_capacity*sizeof(Line));
-        }
-
         state->lines[state->lines_num] = NULL;
     }
 
