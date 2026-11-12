@@ -31,13 +31,15 @@ int main(int argc, char **argv)
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, state.title);
     SetWindowMinSize(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
 
+    SetExitKey(KEY_NULL);
+
     int res = state_init(&state, filename);
     if (res != 0)
         return 1;
 
     SetTargetFPS(FPS);
 
-    while (!state.exit) {
+    while (!state.exit && !WindowShouldClose()) {
         handle_editor_events(&state);
 
         handle_cursor_movement(&state);
