@@ -78,6 +78,9 @@ void append_char_cursor(LedState *state, int c)
 
 void delete_line(LedState *state)
 {
+    if (state->line < 0 || state->line >= state->lines_num)
+        return;
+
     Line line = state->lines[state->line];
     if (!line)
         return;
@@ -86,7 +89,7 @@ void delete_line(LedState *state)
         memset(line, 0, strlen(line));
     } else {
         free(line);
-        for (int i = state->line; i < state->lines_num; ++i)
+        for (int i = state->line; i < state->lines_num - 1; ++i)
             state->lines[i] = state->lines[i + 1];
 
         --state->lines_num;
