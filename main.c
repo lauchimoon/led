@@ -34,8 +34,11 @@ int main(int argc, char **argv)
     SetExitKey(KEY_NULL);
 
     int res = state_init(&state, filename);
-    if (res != 0)
+    if (res != 0) {
+        state_deinit(&state);
+        CloseWindow();
         return 1;
+    }
 
     SetTargetFPS(FPS);
 
