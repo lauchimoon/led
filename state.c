@@ -65,6 +65,7 @@ int state_init(LedState *state, const char *filename)
         return 0;
     }
 
+    state->fileperm = FILEPERM_RW;
     new_line(state);
     return 0;
 }
