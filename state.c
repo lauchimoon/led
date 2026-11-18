@@ -67,6 +67,7 @@ int state_init(LedState *state, const char *filename)
                 printf("led: could not allocate memory\n");
                 return 1;
             }
+            state->dirty = false;
         } else
             state->line = 0;
         return 0;
@@ -173,8 +174,12 @@ void write_file(LedState *state)
         return;
     }
 
-    for (int i = 0; i < state->lines_num; ++i)
-        fprintf(f, "%s\n", state->lines[i]);
+    bool empty_buffer = (state->lines_num == 1 &&
+                         state->lines[0] && state->lines[0][0] == '\0');
+
+    if (!empty_buffer)
+        for (int i = 0; i < state->lines_num; ++i)
+            fprintf(f, "%s\n", state->lines[i]);
 
     fclose(f);
     notify(state, "saved file");
