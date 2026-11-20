@@ -20,7 +20,7 @@ void draw_notification(LedState *state)
     float pad = 8.0f;
     float margin = 12.0f;
     Vector2 text_size = MeasureTextEx(state->font, state->notification,
-                                      state->font_size, 1.0f);
+                                      state->cfg.fontsize, 1.0f);
     Rectangle notify_box = {
         GetScreenWidth() - text_size.x - 2*pad - margin,
         GetScreenHeight() - text_size.y - 2*pad - margin,
@@ -31,5 +31,5 @@ void draw_notification(LedState *state)
     DrawRectangleLinesEx(notify_box, 1.0f, state->theme.text_color);
     DrawTextEx(state->font, state->notification,
                (Vector2){ notify_box.x + pad, notify_box.y + pad },
-               state->font_size, 1.0f, state->theme.text_color);
+               state->cfg.fontsize, 1.0f, state->theme.text_color);
 }

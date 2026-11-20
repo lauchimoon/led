@@ -40,6 +40,9 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    if (state.cfg.fullscreen)
+        ToggleFullscreen();
+
     SetTargetFPS(FPS);
 
     while (!state.exit && !WindowShouldClose()) {
@@ -52,7 +55,7 @@ int main(int argc, char **argv)
 
         BeginMode2D(state.camera);
             for (int i = 0; i < state.lines_num; ++i)
-                draw_text(&state, state.lines[i], 0, i*state.font_size, state.theme.text_color);
+                draw_text(&state, state.lines[i], 0, i*state.cfg.fontsize, state.theme.text_color);
             draw_cursor(&state);
         EndMode2D();
 

@@ -2,11 +2,12 @@
 
 #include "utils.h"
 
+#include <stdio.h>
 #include <string.h>
 
 static int get_number_lines_on_screen(LedState *state)
 {
-    int num_lines = GetScreenHeight()/state->font_size;
+    int num_lines = GetScreenHeight()/state->cfg.fontsize;
     return num_lines - 1;
 }
 
@@ -33,7 +34,7 @@ static void keep_cursor_visible_horizontally(LedState *state)
 
 static void keep_cursor_visible_vertically(LedState *state)
 {
-    int line_height = state->font_size;
+    int line_height = state->cfg.fontsize;
 
     // Leave room for the HUD at the bottom of the screen.
     int screen_height = GetScreenHeight() - line_height;
@@ -101,7 +102,7 @@ void handle_cursor_movement(LedState *state)
             state->line = (state->lines_num > 0)? state->lines_num - 1 : 0;
 
         state->cursor = strlen(state->lines[state->line]);
-        state->camera.target.y = state->font_size*state->line;
+        state->camera.target.y = state->cfg.fontsize*state->line;
     }
 
     if (!IsKeyDown(KEY_LEFT_CONTROL) && key_pressed_or_repeat(KEY_PAGE_UP)) {
@@ -112,7 +113,7 @@ void handle_cursor_movement(LedState *state)
             state->line = 0;
 
         state->cursor = strlen(state->lines[state->line]);
-        state->camera.target.y = state->font_size*state->line;
+        state->camera.target.y = state->cfg.fontsize*state->line;
     }
 
     if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_ZERO))
@@ -140,14 +141,14 @@ void resize_font(LedState *state, int action)
 {
     int sign = (action == RESIZE_ACTION_INCREASE)? 1 : -1;
     int resize_factor = sign*FONT_RESIZE_FACTOR;
-    state->font_size += resize_factor;
+    state->cfg.fontsize += resize_factor;
 
-    if (state->font_size < FONT_RESIZE_MIN) {
-        state->font_size = FONT_RESIZE_MIN;
+    if (state->cfg.fontsize < FONT_RESIZE_MIN) {
+        state->cfg.fontsize = FONT_RESIZE_MIN;
         return;
     }
-    if (state->font_size > FONT_RESIZE_MAX) {
-        state->font_size = FONT_RESIZE_MAX;
+    if (state->cfg.fontsize > FONT_RESIZE_MAX) {
+        state->cfg.fontsize = FONT_RESIZE_MAX;
         return;
     }
 

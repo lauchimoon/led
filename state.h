@@ -5,6 +5,7 @@
 
 #include "raylib.h"
 #include "theme.h"
+#include "cfg.h"
 
 #define LINE_SIZE       1024
 
@@ -26,7 +27,6 @@ typedef char *Line;
 typedef struct LedState {
     const char *filename;
     int cursor;
-    int font_size;
     Font font;
     LedTheme theme;
     long long line;
@@ -40,13 +40,14 @@ typedef struct LedState {
     bool dirty;
     const char *title;
     bool exit;
-    bool number;
 
     char notification[NOTIFICATION_MAX_LEN];
     double notification_end_time;
 
     bool goto_line_active;
     char goto_line_input[GOTO_LINE_MAX_LEN + 1];
+
+    LedCfg cfg;
 } LedState;
 
 int state_init(LedState *state, const char *filename);

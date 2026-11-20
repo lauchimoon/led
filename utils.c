@@ -21,7 +21,7 @@ int get_char_width(LedState *state)
 
 int get_number_column_width(LedState *state)
 {
-    if (!state->number)
+    if (!state->cfg.number)
         return 0;
 
     int digits = digit_count(state->lines_num);

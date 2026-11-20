@@ -5,7 +5,7 @@
 
 void draw_text(LedState *state, const char *text, int x, int y, Color color)
 {
-    DrawTextEx(state->font, text, (Vector2){x, y}, (float)state->font_size, 1.0f, color);
+    DrawTextEx(state->font, text, (Vector2){x, y}, (float)state->cfg.fontsize, 1.0f, color);
 }
 
 void draw_cursor(LedState *state)
@@ -14,18 +14,18 @@ void draw_cursor(LedState *state)
     char ch = state->lines[state->line][cursor_idx];
     GlyphInfo glyph = GetGlyphInfo(state->font, ch);
 
-    Rectangle cursor_rec = { state->cursor*(glyph.advanceX + 1), state->line*state->font_size, glyph.advanceX, state->font_size };
+    Rectangle cursor_rec = { state->cursor*(glyph.advanceX + 1), state->line*state->cfg.fontsize, glyph.advanceX, state->cfg.fontsize };
     DrawRectangleRec(cursor_rec, Fade(state->theme.text_color, 0.5f));
 }
 
 void draw_line_numbers(LedState *state)
 {
-    if (!state->number)
+    if (!state->cfg.number)
         return;
 
     int char_width = get_char_width(state);
     int number_column_width = get_number_column_width(state);
-    int line_height = state->font_size;
+    int line_height = state->cfg.fontsize;
     int screen_height = GetScreenHeight();
 
     DrawRectangle(0, 0, number_column_width, screen_height, state->theme.background_color);
@@ -50,14 +50,14 @@ void draw_line_numbers(LedState *state)
 
 void draw_hud(LedState *state)
 {
-    DrawRectangle(0, GetScreenHeight() - state->font_size, GetScreenWidth(), state->font_size, state->theme.hud_color);
+    DrawRectangle(0, GetScreenHeight() - state->cfg.fontsize, GetScreenWidth(), state->cfg.fontsize, state->theme.hud_color);
     const char *line_information = TextFormat("%lld:%lld",
                                               state->line + 1,
                                               state->cursor + 1);
     const char *info = TextFormat((state->dirty? "%s [*] | %s" : "%s | %s"),
                                   state->filename, line_information);
     const char *text = TextFormat("%s%s", info, (state->fileperm != FILEPERM_RW)? " | Read-only" : "");
-    draw_text(state, text, 0, GetScreenHeight() - state->font_size, state->theme.text_color);
+    draw_text(state, text, 0, GetScreenHeight() - state->cfg.fontsize, state->theme.text_color);
 }
 
 void draw_goto_line_prompt(LedState *state)
@@ -66,7 +66,7 @@ void draw_goto_line_prompt(LedState *state)
         return;
 
     const char *prompt = TextFormat("go to line: %s", state->goto_line_input);
-    Vector2 text_size = MeasureTextEx(state->font, prompt, state->font_size, 1.0f);
+    Vector2 text_size = MeasureTextEx(state->font, prompt, state->cfg.fontsize, 1.0f);
 
     float pad = 8.0f;
     float margin = 12.0f;
@@ -81,5 +81,5 @@ void draw_goto_line_prompt(LedState *state)
     DrawRectangleLinesEx(prompt_box, 1.0f, state->theme.text_color);
     DrawTextEx(state->font, prompt,
                (Vector2){ prompt_box.x + pad, prompt_box.y + pad },
-               state->font_size, 1.0f, state->theme.text_color);
+               state->cfg.fontsize, 1.0f, state->theme.text_color);
 }

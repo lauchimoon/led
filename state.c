@@ -32,10 +32,17 @@ int state_init(LedState *state, const char *filename)
 
     state->cursor = 0;
 
-    state->font_size = FONT_SIZE_INIT;
+    cfg_read(&(state->cfg));
+    if (state->cfg.theme < 0 || state->cfg.theme >= NUM_THEMES)
+        state->cfg.theme = 1;
+    if (state->cfg.fontsize < FONT_RESIZE_MIN)
+        state->cfg.fontsize = FONT_RESIZE_MIN;
+    if (state->cfg.fontsize > FONT_RESIZE_MAX)
+        state->cfg.fontsize = FONT_RESIZE_MAX;
+    state->theme = themes[state->cfg.theme];
+
     state->font = (Font){ 0 };
     state_load_font(state);
-    state->theme = themes[0];
 
     state->line = -1;
     state->lines_capacity = 100;
@@ -49,7 +56,6 @@ int state_init(LedState *state, const char *filename)
 
     state->copy_buffer = calloc(LINE_SIZE, sizeof(char));
     state->dirty = false;
-    state->number = false;
 
     state->goto_line_active = false;
     state->goto_line_input[0] = '\0';
@@ -191,13 +197,14 @@ void state_load_font(LedState *state)
     if (state->font.texture.id != 0)
         UnloadFont(state->font);
 
-    state->font = LoadFontFromMemory(".ttf", GeistMono_Regular_ttf, GeistMono_Regular_ttf_len, state->font_size, NULL, 95);
+    state->font = LoadFontFromMemory(".ttf", GeistMono_Regular_ttf, GeistMono_Regular_ttf_len, state->cfg.fontsize, NULL, 95);
 }
 
 void state_deinit(LedState *state)
 {
+    state->cfg.fullscreen = IsWindowFullscreen();
+    cfg_write(&(state->cfg));
     UnloadFont(state->font);
-    state->font_size = 0;
 
     for (int i = 0; i < state->lines_num; ++i)
         free(state->lines[i]);

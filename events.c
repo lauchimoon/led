@@ -70,16 +70,19 @@ void handle_editor_events(LedState *state)
         else if (IsKeyPressed(KEY_J))
             resize_font(state, RESIZE_ACTION_DECREASE);
         else if (IsKeyDown(KEY_T)) {
-            if (IsKeyPressed(KEY_ONE))
+            if (IsKeyPressed(KEY_ONE)) {
+                state->cfg.theme = 0;
                 state->theme = themes[0];
-            else if (IsKeyPressed(KEY_TWO))
+            } else if (IsKeyPressed(KEY_TWO)) {
+                state->cfg.theme = 1;
                 state->theme = themes[1];
+            }
         } else if (IsKeyPressed(KEY_C))
             copy_line(state);
         else if (state->fileperm == FILEPERM_RW && IsKeyPressed(KEY_V))
             paste_line(state);
         else if (IsKeyPressed(KEY_N))
-            state->number = !state->number;
+            state->cfg.number = !state->cfg.number;
         else if (IsKeyPressed(KEY_G)) {
             state->goto_line_active = true;
             state->goto_line_input[0] = '\0';
